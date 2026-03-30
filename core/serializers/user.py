@@ -7,7 +7,17 @@ from core.models import User
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'groups']
+        fields = [
+            'id',
+            'email',
+            'username',
+            'full_name',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'groups',
+        ]
         depth = 1
 
 
