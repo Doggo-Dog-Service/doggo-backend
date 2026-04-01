@@ -1,11 +1,9 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from . import ServiceType, User
-
 
 class ProviderProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='provider_profile')
+    user = models.OneToOneField('core.User', on_delete=models.CASCADE, related_name='provider_profile')
     fixed_latitude = models.DecimalField(
         max_digits=9, decimal_places=6, validators=[MinValueValidator(-90), MaxValueValidator(90)]
     )
@@ -26,7 +24,7 @@ class ProviderProfile(models.Model):
         null=True,
         blank=True,
     )
-    service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE, related_name='providers')
+    service_type = models.ForeignKey('core.ServiceType', on_delete=models.CASCADE, related_name='providers')
     price_per_hour = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     price_per_day = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -38,7 +36,7 @@ class ProviderProfile(models.Model):
 
 
 class ClientProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client_profile')
+    user = models.OneToOneField('core.User', on_delete=models.CASCADE, related_name='client_profile')
     last_latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
