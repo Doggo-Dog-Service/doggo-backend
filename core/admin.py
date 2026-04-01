@@ -51,7 +51,8 @@ class UserAdmin(BaseUserAdmin):
     )
 
 
-admin.site.register(models.User, UserAdmin)
 admin.site.register(models.ClientProfile)
 admin.site.register(models.ProviderProfile)
+admin.site.register(models.Pet)
 admin.site.register(models.ServiceType)
+admin.site.register(models.User, UserAdmin)
