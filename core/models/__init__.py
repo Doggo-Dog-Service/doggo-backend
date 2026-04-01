@@ -1,3 +1,3 @@
 from .user import User
 from .service import ServiceType
-from .profile import ProviderProfile
+from .profile import ClientProfile, ProviderProfile
