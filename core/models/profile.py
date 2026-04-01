@@ -31,7 +31,7 @@ class ProviderProfile(models.Model):
     price_per_day = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=False)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'({self.id}) user: {self.user.email}, {self.service_type.name}'
@@ -53,7 +53,7 @@ class ClientProfile(models.Model):
         null=True,
         blank=True,
     )
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'({self.id}) user: {self.user.email}'
