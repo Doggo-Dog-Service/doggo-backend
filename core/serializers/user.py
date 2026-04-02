@@ -7,7 +7,18 @@ from core.models import User
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'groups']
+        fields = [
+            'id',
+            'email',
+            'full_name',
+            'provider_profile',
+            'client_profile',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'groups',
+        ]
         depth = 1
 
 
@@ -16,7 +27,7 @@ class UserRegistrationSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'password']
+        fields = ['id', 'email', 'full_name', 'password']
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)

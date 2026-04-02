@@ -39,9 +39,10 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """User model in the system."""
-
     email = models.EmailField(max_length=255, unique=True, verbose_name=_('email'), help_text=_('Email'))
-    name = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('name'), help_text=_('Username'))
+    full_name = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('name'), help_text=_('Username'))
+    cpf = models.CharField(max_length=11)
+    phone = models.CharField(max_length=11, null=True, blank=True)
     is_active = models.BooleanField(
         default=True, verbose_name=_('Usuário está ativo'), help_text=_('Indica que este usuário está ativo.')
     )
@@ -50,7 +51,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_('Usuário é da equipe'),
         help_text=_('Indica que este usuário pode acessar o Admin.'),
     )
-
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
