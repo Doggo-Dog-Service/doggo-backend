@@ -19,7 +19,6 @@ class UserSerializer(ModelSerializer):
             'last_login',
             'groups',
         ]
-        depth = 1
 
 
 class UserRegistrationSerializer(ModelSerializer):
