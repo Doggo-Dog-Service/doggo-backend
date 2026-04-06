@@ -15,9 +15,9 @@ class Service(models.Model):
         IN_PROGRESS = 'in_progress', 'Em andamento'
         FINISHED = 'finished', 'Concluído'
 
-    pet = models.ForeignKey('core.Pet', on_delete=models.PROTECT)
-    provider = models.ForeignKey('core.ProviderProfile', on_delete=models.PROTECT)
-    service_type = models.ForeignKey(ServiceType, on_delete=models.PROTECT)
+    pet = models.ForeignKey('core.Pet', on_delete=models.PROTECT, related_name='services')
+    provider = models.ForeignKey('core.ProviderProfile', on_delete=models.PROTECT, related_name='services')
+    service_type = models.ForeignKey(ServiceType, on_delete=models.PROTECT, related_name='services')
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=ServiceStatus.choices, null=False, default=ServiceStatus.PENDING)

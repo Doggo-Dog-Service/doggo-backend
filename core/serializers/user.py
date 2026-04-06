@@ -19,7 +19,6 @@ class UserSerializer(ModelSerializer):
             'last_login',
             'groups',
         ]
-        depth = 1
 
 
 class UserRegistrationSerializer(ModelSerializer):
@@ -31,3 +30,21 @@ class UserRegistrationSerializer(ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+
+class UserProfileSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'full_name',
+            'provider_profile',
+            'client_profile',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'groups',
+        ]
+        depth = 1

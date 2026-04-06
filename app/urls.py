@@ -12,11 +12,27 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from core.views import UserRegistrationView, UserViewSet
+from core.views import (
+    ClientViewSet,
+    PetViewSet,
+    ProfileView,
+    ProviderViewSet,
+    ServiceTypeViewSet,
+    ServiceViewSet,
+    UserRegistrationView,
+    UserViewSet,
+)
 
 router = DefaultRouter()
 
-router.register(r'usuarios', UserViewSet, basename='usuarios')
+
+router.register(r'clients', ClientViewSet, basename='clients')
+router.register(r'pets', PetViewSet, basename='pets')
+router.register(r'providers', ProviderViewSet, basename='providers')
+router.register(r'services', ServiceViewSet, basename='services')
+router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
+router.register(r'users', UserViewSet, basename='users')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,7 +53,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Registro de usuários
-    path('api/registro/', UserRegistrationView.as_view(), name='user_registration'),
+    path('api/register/', UserRegistrationView.as_view(), name='user_registration'),
+    path('api/profile/', ProfileView.as_view(), name='user_profile'),
     # API
     path('api/', include(router.urls)),
 ]
