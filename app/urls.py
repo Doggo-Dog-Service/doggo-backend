@@ -15,6 +15,7 @@ from rest_framework_simplejwt.views import (
 from core.views import (
     ClientViewSet,
     PetViewSet,
+    ProfileView,
     ProviderViewSet,
     ServiceTypeViewSet,
     ServiceViewSet,
@@ -53,6 +54,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Registro de usuários
     path('api/register/', UserRegistrationView.as_view(), name='user_registration'),
+    path('api/profile/', ProfileView.as_view(), name='user_profile'),
     # API
     path('api/', include(router.urls)),
 ]
