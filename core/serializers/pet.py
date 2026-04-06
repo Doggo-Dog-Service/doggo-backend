@@ -45,3 +45,4 @@ class PetDetailSerializer(serializers.ModelSerializer):
             'created_at'
         )
         read_only_fields = ('id', 'owner', 'created_at')
+        depth = 2

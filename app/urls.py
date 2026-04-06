@@ -14,6 +14,7 @@ from rest_framework_simplejwt.views import (
 
 from core.views import (
     ClientViewSet,
+    PetViewSet,
     ProviderViewSet,
     ServiceTypeViewSet,
     ServiceViewSet,
@@ -25,6 +26,7 @@ router = DefaultRouter()
 
 
 router.register(r'clients', ClientViewSet, basename='clients')
+router.register(r'pets', PetViewSet, basename='pets')
 router.register(r'providers', ProviderViewSet, basename='providers')
 router.register(r'services', ServiceViewSet, basename='services')
 router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
