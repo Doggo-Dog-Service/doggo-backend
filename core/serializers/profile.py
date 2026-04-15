@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.models import ClientProfile, ProviderProfile
+from core.serializers.service import ServiceTypeInformationSerializer
 from core.serializers.user import UserSerializer
 
 
@@ -38,6 +39,7 @@ class ClientDetailSerializer(serializers.ModelSerializer):
 
 class ProviderSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    service_type = ServiceTypeInformationSerializer(read_only=True)
 
     class Meta:
         model = ProviderProfile
