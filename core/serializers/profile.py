@@ -39,7 +39,7 @@ class ClientDetailSerializer(serializers.ModelSerializer):
 
 class ProviderSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    service_type = ServiceTypeInformationSerializer(read_only=True)
+    service_type_detail = ServiceTypeInformationSerializer(source='service_type', read_only=True)
 
     class Meta:
         model = ProviderProfile
@@ -51,6 +51,7 @@ class ProviderSerializer(serializers.ModelSerializer):
             'last_latitude',
             'last_longitude',
             'service_type',
+            'service_type_detail',
             'price_per_hour',
             'price_per_day',
             'description',
