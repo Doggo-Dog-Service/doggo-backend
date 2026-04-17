@@ -20,3 +20,17 @@ class ProviderViewSet(ModelViewSet):
         if self.action == 'retrieve':
             return ProviderDetailSerializer
         return ProviderSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        service_type = self.request.query_params.get('service_type')
+        is_active = self.request.query_params.get('is_active')
+
+        if service_type:
+            queryset = queryset.filter(service_type=service_type)
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+
+        return queryset
