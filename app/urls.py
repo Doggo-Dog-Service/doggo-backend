@@ -14,6 +14,7 @@ from rest_framework_simplejwt.views import (
 
 from core.views import (
     ClientViewSet,
+    GlobalSearchView,
     PetViewSet,
     ProfileView,
     ProviderViewSet,
@@ -55,6 +56,8 @@ urlpatterns = [
     # Registro de usuários
     path('api/register/', UserRegistrationView.as_view(), name='user_registration'),
     path('api/profile/', ProfileView.as_view(), name='user_profile'),
+    # Busca
+    path('api/search/', GlobalSearchView.as_view(), name='search'),
     # API
     path('api/', include(router.urls)),
 ]
