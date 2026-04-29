@@ -1,24 +1,23 @@
-from tkinter import Image
-
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SlugRelatedField
 
 from core.models import User
-from uploader.serializers.image import ImageSerializer
+from uploader.models import Image
+from uploader.serializers import ImageSerializer
 
 
 class UserSerializer(ModelSerializer):
+    profile_picture_attachment_key = SlugRelatedField(
+        source='profile_picture',
+        queryset=Image.objects.all(),
+        slug_field='attachment_key',
+        required=False,
+        write_only=True,
+    )
+    profile_picture = ImageSerializer(required=False, read_only=True)
+
     class Meta:
         model = User
-        profile_picture_attachment_key = SlugRelatedField(
-            source='profile_picture',
-            queryset=Image.objects.all(),
-            slug_field='attachment_key',
-            required=False,
-            write_only=True,
-        )
-        profile_picture = ImageSerializer(required=False, read_only=True)
-
         fields = [
             'id',
             'email',
@@ -30,7 +29,7 @@ class UserSerializer(ModelSerializer):
             'is_superuser',
             'last_login',
             'groups',
-            'profie_picture',
+            'profile_picture',
             'profile_picture_attachment_key'
         ]
 

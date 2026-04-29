@@ -1,9 +1,21 @@
 from rest_framework import serializers
+from rest_framework.serializers import SlugRelatedField
 
 from core.models import ClientProfile, Pet
+from uploader.models import Image
+from uploader.serializers import ImageSerializer
 
 
 class PetSerializer(serializers.ModelSerializer):
+    pet_profile_attachment_key = SlugRelatedField(
+        source='pet_profile',
+        queryset=Image,
+        slug_field='attachment_key',
+        required=False,
+        write_only=True,
+    )
+    pet_profile = ImageSerializer(required=False, read_only=True)
+
     class Meta:
         model = Pet
         fields = (
@@ -15,7 +27,9 @@ class PetSerializer(serializers.ModelSerializer):
             'weight',
             'notes',
             'vaccination_status',
-            'created_at'
+            'created_at',
+            'pet_profile',
+            'pet_profile_attachment_key'
         )
         read_only_fields = ('id', 'owner', 'created_at')
 
@@ -31,6 +45,7 @@ class PetSerializer(serializers.ModelSerializer):
 
 
 class PetDetailSerializer(serializers.ModelSerializer):
+    pet_profile = ImageSerializer(required=False)
     class Meta:
         model = Pet
         fields = (
@@ -43,6 +58,8 @@ class PetDetailSerializer(serializers.ModelSerializer):
             'notes',
             'vaccination_status',
             'created_at'
+            'pet_profile',
+            'pet_profile_attachment_key'
         )
         read_only_fields = ('id', 'owner', 'created_at')
         depth = 2
