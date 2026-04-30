@@ -1,5 +1,7 @@
 from django.db import models
 
+from uploader.models import Image
+
 from .profile import ClientProfile
 
 
@@ -22,6 +24,14 @@ class Pet(models.Model):
     notes = models.TextField(null=True, blank=True)
     vaccination_status = models.CharField(max_length=1, choices=VaccinationStatus.choices)
     created_at = models.DateTimeField(auto_now_add=True)
+    pet_picture = models.ForeignKey(
+        Image,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+    )
 
     def __str__(self):
         return f'({self.id}) {self.name}, dono: {self.owner.user.email}'
