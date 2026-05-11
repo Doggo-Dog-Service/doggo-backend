@@ -59,5 +59,6 @@ class UserProfileSerializer(ModelSerializer):
             'is_superuser',
             'last_login',
             'groups',
+            'profile_picture',
         ]
         depth = 1
