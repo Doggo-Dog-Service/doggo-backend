@@ -46,6 +46,8 @@ class UserRegistrationSerializer(ModelSerializer):
 
 
 class UserProfileSerializer(ModelSerializer):
+    provider_profile = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -62,3 +64,11 @@ class UserProfileSerializer(ModelSerializer):
             'profile_picture',
         ]
         depth = 1
+
+    def get_provider_profile(self, obj):
+        from core.serializers.profile import ProviderSerializer  # noqa: PLC0415
+
+        if obj.provider_profile:
+            return ProviderSerializer(obj.provider_profile).data
+
+        return None
