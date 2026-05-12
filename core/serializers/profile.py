@@ -82,4 +82,4 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'is_active',
             'created_at',
         )
-        depth = 1
+        depth = 2
