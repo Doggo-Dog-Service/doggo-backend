@@ -37,7 +37,7 @@ router.register(r'providers', ProviderViewSet, basename='providers')
 router.register(r'services', ServiceViewSet, basename='services')
 router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
 router.register(r'users', UserViewSet, basename='users')
-router.register(r'payment', PaymentViewSet, basename='payment')
+router.register(r'payments', PaymentViewSet, basename='payment')
 
 
 urlpatterns = [
