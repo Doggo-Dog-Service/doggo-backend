@@ -37,9 +37,16 @@ class UserSerializer(ModelSerializer):
 class UserRegistrationSerializer(ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
 
+    profile_picture = serializers.SlugRelatedField(
+        queryset=Image.objects.all(),
+        slug_field='attachment_key',
+        required=False,
+        write_only=True,
+    )
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'cpf', 'phone', 'full_name', 'password']
+        fields = ['id', 'profile_picture', 'email', 'cpf', 'phone', 'full_name', 'password']
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
