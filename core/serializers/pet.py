@@ -59,7 +59,6 @@ class PetDetailSerializer(serializers.ModelSerializer):
             'vaccination_status',
             'created_at',
             'pet_picture',
-            'pet_picture_attachment_key',
         )
         read_only_fields = ('id', 'owner', 'created_at')
         depth = 2
