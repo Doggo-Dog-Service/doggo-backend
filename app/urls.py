@@ -20,6 +20,7 @@ from core.views import (
     PetViewSet,
     ProfileView,
     ProviderViewSet,
+    ReviewViewSet,
     ServiceTypeViewSet,
     ServiceViewSet,
     UserRegistrationView,
@@ -38,6 +39,7 @@ router.register(r'services', ServiceViewSet, basename='services')
 router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'payments', PaymentViewSet, basename='payment')
+router.register(r'reviews', ReviewViewSet, basename='reviews')
 
 
 urlpatterns = [
