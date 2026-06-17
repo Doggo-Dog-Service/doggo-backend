@@ -81,5 +81,6 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'description',
             'is_active',
             'created_at',
+            'reviews',
         )
         depth = 2
