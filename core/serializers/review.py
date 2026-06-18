@@ -1,6 +1,27 @@
 from rest_framework import serializers
 
-from core.models import ClientProfile, Review
+from core.models import ClientProfile, Review, User
+
+
+class ReviewUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'full_name',
+            'profile_picture',
+        )
+
+
+class ReviewClientSerializer(serializers.ModelSerializer):
+    user = ReviewUserSerializer(read_only=True)
+
+    class Meta:
+        model = ClientProfile
+        fields = (
+            'id',
+            'user',
+        )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -28,6 +49,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
+    client = ReviewClientSerializer(read_only=True)
+
     class Meta:
         model = Review
         fields = (
@@ -38,5 +61,3 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             'comment',
             'created_at',
         )
-        read_only_fields = ('id', 'client', 'created_at',)
-        depth = 2
