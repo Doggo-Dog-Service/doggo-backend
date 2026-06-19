@@ -1,7 +1,12 @@
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Service, ServiceType
-from core.serializers import ServiceDetailSerializer, ServiceSerializer, ServiceTypeSerializer
+from core.serializers import (
+    ServiceDetailSerializer,
+    ServiceSerializer,
+    ServiceTypeRegisterSerializer,
+    ServiceTypeSerializer,
+)
 
 
 class ServiceViewSet(ModelViewSet):
@@ -15,4 +20,8 @@ class ServiceViewSet(ModelViewSet):
 
 class ServiceTypeViewSet(ModelViewSet):
     queryset = ServiceType.objects.all()
-    serializer_class = ServiceTypeSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ServiceTypeRegisterSerializer
+        return ServiceTypeSerializer
