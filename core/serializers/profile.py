@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.models import ClientProfile, ProviderProfile
+from core.serializers.review import ReviewDetailSerializer
 from core.serializers.service import ServiceTypeInformationSerializer
 from core.serializers.user import UserSerializer
 
@@ -65,6 +66,10 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 
 class ProviderDetailSerializer(serializers.ModelSerializer):
+    reviews = ReviewDetailSerializer(
+        many=True,
+        read_only=True,
+    )
     class Meta:
         model = ProviderProfile
         fields = (
@@ -81,5 +86,6 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'description',
             'is_active',
             'created_at',
+            'reviews',
         )
         depth = 2
