@@ -1,32 +1,2096 @@
 [
-{
-  "model": "core.user",
-  "pk": 1,
-  "fields": {
-    "password": "pbkdf2_sha256$1000000$7WWh9s6jMzry2Gbnx30H8d$wIZzPnIKrhbOpBi0Ny25dtOcRoOK+ileRqPtzv+CUQk=",
-    "last_login": "2026-03-11T18:29:40.363Z",
-    "is_superuser": true,
-    "email": "a@a.com",
-    "name": "Superusuário",
-    "is_active": true,
-    "is_staff": true,
-    "groups": [],
-    "user_permissions": []
+  {
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+      "action_time": "2026-04-01T01:23:25.492Z",
+      "user": 1,
+      "content_type": 7,
+      "object_id": "1",
+      "object_repr": "ServiceType object (1)",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+      "action_time": "2026-04-01T01:24:56.620Z",
+      "user": 1,
+      "content_type": 7,
+      "object_id": "2",
+      "object_repr": "(2) Dog Sitter",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+      "action_time": "2026-04-01T01:28:31.593Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "2",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+      "action_time": "2026-04-01T01:37:25.106Z",
+      "user": 1,
+      "content_type": 8,
+      "object_id": "1",
+      "object_repr": "(1) user: schultzandrericardo@gmail.com, Dog Walker",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 12,
+    "fields": {
+      "action_time": "2026-04-01T15:14:10.710Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "3",
+      "object_repr": "cliente@cliente.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 13,
+    "fields": {
+      "action_time": "2026-04-01T15:14:22.629Z",
+      "user": 1,
+      "content_type": 9,
+      "object_id": "1",
+      "object_repr": "(1) user: cliente@cliente.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 14,
+    "fields": {
+      "action_time": "2026-04-01T15:14:30.384Z",
+      "user": 1,
+      "content_type": 9,
+      "object_id": "1",
+      "object_repr": "(1) user: cliente@cliente.com",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 15,
+    "fields": {
+      "action_time": "2026-04-01T17:39:22.899Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "(1) Ted, dono: cliente@cliente.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 16,
+    "fields": {
+      "action_time": "2026-04-01T17:39:43.191Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "(1) Max, dono: cliente@cliente.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 17,
+    "fields": {
+      "action_time": "2026-04-01T17:41:36.368Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "1",
+      "object_repr": "(1) provedor: schultzandrericardo@gmail.com, pet: (1) Max, dono: cliente@cliente.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 18,
+    "fields": {
+      "action_time": "2026-04-01T17:43:03.766Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "1",
+      "object_repr": "(1) provedor: schultzandrericardo@gmail.com, pet: (1) Max, dono: cliente@cliente.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Price\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 19,
+    "fields": {
+      "action_time": "2026-04-01T17:43:08.793Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "1",
+      "object_repr": "(1) provedor: schultzandrericardo@gmail.com, pet: (1) Max, dono: cliente@cliente.com",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 20,
+    "fields": {
+      "action_time": "2026-04-03T16:47:02.478Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "4",
+      "object_repr": "teste@teste.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 21,
+    "fields": {
+      "action_time": "2026-04-13T18:18:53.342Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "5",
+      "object_repr": "andrenarutto7@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 22,
+    "fields": {
+      "action_time": "2026-04-15T01:25:36.083Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "2",
+      "object_repr": "(2) provedor: schultzandrericardo@gmail.com, pet: (1) Thor, dono: cliente@cliente.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 23,
+    "fields": {
+      "action_time": "2026-04-15T01:25:57.725Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "2",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 24,
+    "fields": {
+      "action_time": "2026-04-15T11:14:51.141Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "8",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 25,
+    "fields": {
+      "action_time": "2026-04-15T11:14:56.889Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "6",
+      "object_repr": "andrenarutto7@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 26,
+    "fields": {
+      "action_time": "2026-04-15T11:19:18.850Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "11",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 27,
+    "fields": {
+      "action_time": "2026-04-15T11:34:23.428Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "12",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 28,
+    "fields": {
+      "action_time": "2026-04-15T11:46:58.205Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "13",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 29,
+    "fields": {
+      "action_time": "2026-04-15T11:50:35.898Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "7",
+      "object_repr": "johann.estudos27@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 30,
+    "fields": {
+      "action_time": "2026-04-15T12:02:22.628Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "15",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"password\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 31,
+    "fields": {
+      "action_time": "2026-04-15T12:05:00.938Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "15",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 32,
+    "fields": {
+      "action_time": "2026-04-17T16:13:56.606Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "9",
+      "object_repr": "rafael@rafael.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 33,
+    "fields": {
+      "action_time": "2026-04-17T16:14:03.904Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "16",
+      "object_repr": "johannmborges27@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 34,
+    "fields": {
+      "action_time": "2026-04-17T16:14:22.046Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "17",
+      "object_repr": "jc.mpneto@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 35,
+    "fields": {
+      "action_time": "2026-04-17T16:15:31.774Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "14",
+      "object_repr": "jpbachmann32@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 36,
+    "fields": {
+      "action_time": "2026-04-17T16:15:35.802Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "10",
+      "object_repr": "joao@joao.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 37,
+    "fields": {
+      "action_time": "2026-04-17T16:15:50.214Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "19",
+      "object_repr": "provedorcompreco@p.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 38,
+    "fields": {
+      "action_time": "2026-04-17T16:15:55.260Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "18",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 39,
+    "fields": {
+      "action_time": "2026-04-17T16:16:00.353Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "4",
+      "object_repr": "teste@teste.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 40,
+    "fields": {
+      "action_time": "2026-04-17T16:16:05.852Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "3",
+      "object_repr": "cliente@cliente.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 41,
+    "fields": {
+      "action_time": "2026-04-29T11:51:45.200Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "20",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profile picture\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 42,
+    "fields": {
+      "action_time": "2026-04-29T11:56:03.584Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "1",
+      "object_repr": " - 389fb8b8-9c49-4e13-b09d-a7f7e0ac663f",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 43,
+    "fields": {
+      "action_time": "2026-04-29T11:56:34.866Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "2",
+      "object_repr": " - 8af48b0e-4625-4d3b-9c4e-2fab4317153f",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 44,
+    "fields": {
+      "action_time": "2026-04-29T11:56:50.404Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "20",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profile picture\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 45,
+    "fields": {
+      "action_time": "2026-04-29T21:18:37.063Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "3",
+      "object_repr": "(3) Bobby, dono: brenoot0405@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 46,
+    "fields": {
+      "action_time": "2026-04-29T21:18:41.201Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "3",
+      "object_repr": "(3) Bobby, dono: brenoot0405@gmail.com",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 47,
+    "fields": {
+      "action_time": "2026-05-06T11:51:19.181Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "3",
+      "object_repr": "foto_perfil_andre - 3d0eafa3-28e8-4d90-a164-201461c67e69",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 48,
+    "fields": {
+      "action_time": "2026-05-06T11:51:34.799Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "20",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profile picture\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 49,
+    "fields": {
+      "action_time": "2026-05-06T12:00:54.446Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "4",
+      "object_repr": "foto_perfil_renan - 8d861855-c1d8-4256-8782-957cf13caa52",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 50,
+    "fields": {
+      "action_time": "2026-05-06T12:01:05.577Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "22",
+      "object_repr": "renanlima123@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profile picture\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 51,
+    "fields": {
+      "action_time": "2026-05-22T21:52:47.913Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "27",
+      "object_repr": "roberto@carlos.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 52,
+    "fields": {
+      "action_time": "2026-06-08T16:33:07.972Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "3",
+      "object_repr": "(3) provedor: schultzandrericardo@gmail.com, pet: (3) Bobby, dono: brenoot0405@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 53,
+    "fields": {
+      "action_time": "2026-06-08T16:34:57.465Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "4",
+      "object_repr": "(4) provedor: renanlima123@gmail.com, pet: (3) Bobby, dono: brenoot0405@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 54,
+    "fields": {
+      "action_time": "2026-06-08T16:36:21.023Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "20",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 55,
+    "fields": {
+      "action_time": "2026-06-08T16:38:31.442Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "28",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 56,
+    "fields": {
+      "action_time": "2026-06-08T16:52:26.925Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "29",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 57,
+    "fields": {
+      "action_time": "2026-06-08T17:03:22.373Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "30",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profile picture\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 58,
+    "fields": {
+      "action_time": "2026-06-08T17:05:22.784Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "30",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 59,
+    "fields": {
+      "action_time": "2026-06-08T17:05:28.287Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "5",
+      "object_repr": "schultzandrericardo@gmail.com - 1013804c-c950-4688-aeba-2ab0c859ed75",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 60,
+    "fields": {
+      "action_time": "2026-06-08T17:12:06.748Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "7",
+      "object_repr": "schultzandrericardo@gmail.com - cd6a3bce-ba4d-47c8-8dec-53749cff197c",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 61,
+    "fields": {
+      "action_time": "2026-06-08T17:12:10.099Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "6",
+      "object_repr": "schultzandrericardo@gmail.com - afae0c72-6dc4-4397-a062-8ade7fbde6ba",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 62,
+    "fields": {
+      "action_time": "2026-06-08T17:22:39.924Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "9",
+      "object_repr": "schultzandrericardo@gmail.com - df130359-817b-4237-ba2a-04a09d8db84c",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 63,
+    "fields": {
+      "action_time": "2026-06-08T17:22:42.773Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "8",
+      "object_repr": "schultzandrericardo@gmail.com - 5a0f59d9-8233-4fd3-a1ca-b6e7adb7f737",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 64,
+    "fields": {
+      "action_time": "2026-06-08T17:24:28.336Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "10",
+      "object_repr": "schultzandrericardo@gmail.com - e14332ba-6c3c-434b-8117-3dfea545d75c",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 65,
+    "fields": {
+      "action_time": "2026-06-08T18:20:33.418Z",
+      "user": 1,
+      "content_type": 8,
+      "object_id": "20",
+      "object_repr": "(20) user: schultzandrericardo@gmail.com, Dog Walker",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 66,
+    "fields": {
+      "action_time": "2026-06-08T19:18:19.884Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "11",
+      "object_repr": "schultzandrericardo@gmail.com - a8044b11-fff4-4881-abc4-5ae87df0d271",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 67,
+    "fields": {
+      "action_time": "2026-06-08T19:18:24.698Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "31",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 68,
+    "fields": {
+      "action_time": "2026-06-08T19:19:20.277Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "4",
+      "object_repr": "foto_perfil_renan - 8d861855-c1d8-4256-8782-957cf13caa52",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 69,
+    "fields": {
+      "action_time": "2026-06-08T19:19:23.659Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "22",
+      "object_repr": "renanlima123@gmail.com",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 70,
+    "fields": {
+      "action_time": "2026-06-08T19:19:38.361Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "3",
+      "object_repr": "foto_perfil_andre - 3d0eafa3-28e8-4d90-a164-201461c67e69",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 71,
+    "fields": {
+      "action_time": "2026-06-08T19:19:40.508Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "2",
+      "object_repr": " - 8af48b0e-4625-4d3b-9c4e-2fab4317153f",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 72,
+    "fields": {
+      "action_time": "2026-06-08T19:19:59.684Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "31",
+      "object_repr": "schultzandrericardo@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 73,
+    "fields": {
+      "action_time": "2026-06-16T01:20:59.183Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "24",
+      "object_repr": "gaby.tom.ltr@gmail.com",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 74,
+    "fields": {
+      "action_time": "2026-06-16T01:21:45.814Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "33",
+      "object_repr": "gaby.tom.ltr@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 75,
+    "fields": {
+      "action_time": "2026-06-16T01:21:56.440Z",
+      "user": 1,
+      "content_type": 9,
+      "object_id": "7",
+      "object_repr": "(7) user: gaby.tom.ltr@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 76,
+    "fields": {
+      "action_time": "2026-06-17T21:03:43.223Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "2",
+      "object_repr": "(2) cliente: brenoot0405@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 77,
+    "fields": {
+      "action_time": "2026-06-17T21:21:00.323Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "3",
+      "object_repr": "(3) cliente: gaby.tom.ltr@gmail.com",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 78,
+    "fields": {
+      "action_time": "2026-06-17T21:22:42.443Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "1",
+      "object_repr": "(1) cliente: gaby.tom.ltr@gmail.com",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 79,
+    "fields": {
+      "action_time": "2026-06-17T21:23:05.608Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "3",
+      "object_repr": "(3) cliente: gaby.tom.ltr@gmail.com",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Comment\"]}}]"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 1,
+    "fields": {
+      "name": "Can add log entry",
+      "content_type": 1,
+      "codename": "add_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 2,
+    "fields": {
+      "name": "Can change log entry",
+      "content_type": 1,
+      "codename": "change_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 3,
+    "fields": {
+      "name": "Can delete log entry",
+      "content_type": 1,
+      "codename": "delete_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 4,
+    "fields": {
+      "name": "Can view log entry",
+      "content_type": 1,
+      "codename": "view_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 5,
+    "fields": {
+      "name": "Can add permission",
+      "content_type": 2,
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 6,
+    "fields": {
+      "name": "Can change permission",
+      "content_type": 2,
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 7,
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": 2,
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 8,
+    "fields": {
+      "name": "Can view permission",
+      "content_type": 2,
+      "codename": "view_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 9,
+    "fields": {
+      "name": "Can add group",
+      "content_type": 3,
+      "codename": "add_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 10,
+    "fields": {
+      "name": "Can change group",
+      "content_type": 3,
+      "codename": "change_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 11,
+    "fields": {
+      "name": "Can delete group",
+      "content_type": 3,
+      "codename": "delete_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 12,
+    "fields": {
+      "name": "Can view group",
+      "content_type": 3,
+      "codename": "view_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 13,
+    "fields": {
+      "name": "Can add content type",
+      "content_type": 4,
+      "codename": "add_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 14,
+    "fields": {
+      "name": "Can change content type",
+      "content_type": 4,
+      "codename": "change_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 15,
+    "fields": {
+      "name": "Can delete content type",
+      "content_type": 4,
+      "codename": "delete_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 16,
+    "fields": {
+      "name": "Can view content type",
+      "content_type": 4,
+      "codename": "view_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 17,
+    "fields": {
+      "name": "Can add session",
+      "content_type": 5,
+      "codename": "add_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 18,
+    "fields": {
+      "name": "Can change session",
+      "content_type": 5,
+      "codename": "change_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 19,
+    "fields": {
+      "name": "Can delete session",
+      "content_type": 5,
+      "codename": "delete_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 20,
+    "fields": {
+      "name": "Can view session",
+      "content_type": 5,
+      "codename": "view_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 21,
+    "fields": {
+      "name": "Can add Usuário",
+      "content_type": 6,
+      "codename": "add_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 22,
+    "fields": {
+      "name": "Can change Usuário",
+      "content_type": 6,
+      "codename": "change_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 23,
+    "fields": {
+      "name": "Can delete Usuário",
+      "content_type": 6,
+      "codename": "delete_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 24,
+    "fields": {
+      "name": "Can view Usuário",
+      "content_type": 6,
+      "codename": "view_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 25,
+    "fields": {
+      "name": "Can add service type",
+      "content_type": 7,
+      "codename": "add_servicetype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 26,
+    "fields": {
+      "name": "Can change service type",
+      "content_type": 7,
+      "codename": "change_servicetype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 27,
+    "fields": {
+      "name": "Can delete service type",
+      "content_type": 7,
+      "codename": "delete_servicetype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 28,
+    "fields": {
+      "name": "Can view service type",
+      "content_type": 7,
+      "codename": "view_servicetype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 29,
+    "fields": {
+      "name": "Can add provider profile",
+      "content_type": 8,
+      "codename": "add_providerprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 30,
+    "fields": {
+      "name": "Can change provider profile",
+      "content_type": 8,
+      "codename": "change_providerprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 31,
+    "fields": {
+      "name": "Can delete provider profile",
+      "content_type": 8,
+      "codename": "delete_providerprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 32,
+    "fields": {
+      "name": "Can view provider profile",
+      "content_type": 8,
+      "codename": "view_providerprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 33,
+    "fields": {
+      "name": "Can add client profile",
+      "content_type": 9,
+      "codename": "add_clientprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 34,
+    "fields": {
+      "name": "Can change client profile",
+      "content_type": 9,
+      "codename": "change_clientprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 35,
+    "fields": {
+      "name": "Can delete client profile",
+      "content_type": 9,
+      "codename": "delete_clientprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 36,
+    "fields": {
+      "name": "Can view client profile",
+      "content_type": 9,
+      "codename": "view_clientprofile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 37,
+    "fields": {
+      "name": "Can add pet",
+      "content_type": 10,
+      "codename": "add_pet"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 38,
+    "fields": {
+      "name": "Can change pet",
+      "content_type": 10,
+      "codename": "change_pet"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 39,
+    "fields": {
+      "name": "Can delete pet",
+      "content_type": 10,
+      "codename": "delete_pet"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 40,
+    "fields": {
+      "name": "Can view pet",
+      "content_type": 10,
+      "codename": "view_pet"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 41,
+    "fields": {
+      "name": "Can add service",
+      "content_type": 11,
+      "codename": "add_service"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 42,
+    "fields": {
+      "name": "Can change service",
+      "content_type": 11,
+      "codename": "change_service"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 43,
+    "fields": {
+      "name": "Can delete service",
+      "content_type": 11,
+      "codename": "delete_service"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 44,
+    "fields": {
+      "name": "Can view service",
+      "content_type": 11,
+      "codename": "view_service"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 45,
+    "fields": {
+      "name": "Can add document",
+      "content_type": 12,
+      "codename": "add_document"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 46,
+    "fields": {
+      "name": "Can change document",
+      "content_type": 12,
+      "codename": "change_document"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 47,
+    "fields": {
+      "name": "Can delete document",
+      "content_type": 12,
+      "codename": "delete_document"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 48,
+    "fields": {
+      "name": "Can view document",
+      "content_type": 12,
+      "codename": "view_document"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 49,
+    "fields": {
+      "name": "Can add image",
+      "content_type": 13,
+      "codename": "add_image"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 50,
+    "fields": {
+      "name": "Can change image",
+      "content_type": 13,
+      "codename": "change_image"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 51,
+    "fields": {
+      "name": "Can delete image",
+      "content_type": 13,
+      "codename": "delete_image"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 52,
+    "fields": {
+      "name": "Can view image",
+      "content_type": 13,
+      "codename": "view_image"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 53,
+    "fields": {
+      "name": "Can add payment",
+      "content_type": 14,
+      "codename": "add_payment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 54,
+    "fields": {
+      "name": "Can change payment",
+      "content_type": 14,
+      "codename": "change_payment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 55,
+    "fields": {
+      "name": "Can delete payment",
+      "content_type": 14,
+      "codename": "delete_payment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 56,
+    "fields": {
+      "name": "Can view payment",
+      "content_type": 14,
+      "codename": "view_payment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 57,
+    "fields": {
+      "name": "Can add review",
+      "content_type": 15,
+      "codename": "add_review"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 58,
+    "fields": {
+      "name": "Can change review",
+      "content_type": 15,
+      "codename": "change_review"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 59,
+    "fields": {
+      "name": "Can delete review",
+      "content_type": 15,
+      "codename": "delete_review"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 60,
+    "fields": {
+      "name": "Can view review",
+      "content_type": 15,
+      "codename": "view_review"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 1,
+    "fields": {
+      "app_label": "admin",
+      "model": "logentry"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 2,
+    "fields": {
+      "app_label": "auth",
+      "model": "permission"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 3,
+    "fields": {
+      "app_label": "auth",
+      "model": "group"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 4,
+    "fields": {
+      "app_label": "contenttypes",
+      "model": "contenttype"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 5,
+    "fields": {
+      "app_label": "sessions",
+      "model": "session"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 6,
+    "fields": {
+      "app_label": "core",
+      "model": "user"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 7,
+    "fields": {
+      "app_label": "core",
+      "model": "servicetype"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 8,
+    "fields": {
+      "app_label": "core",
+      "model": "providerprofile"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 9,
+    "fields": {
+      "app_label": "core",
+      "model": "clientprofile"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 10,
+    "fields": {
+      "app_label": "core",
+      "model": "pet"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 11,
+    "fields": {
+      "app_label": "core",
+      "model": "service"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 12,
+    "fields": {
+      "app_label": "uploader",
+      "model": "document"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 13,
+    "fields": {
+      "app_label": "uploader",
+      "model": "image"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 14,
+    "fields": {
+      "app_label": "core",
+      "model": "payment"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 15,
+    "fields": {
+      "app_label": "core",
+      "model": "review"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "2qfxw1d7u8fdgd3cnyh7fmgfv966orow",
+    "fields": {
+      "session_data": ".eJxVzM0OwiAQBOB34WwIf4WuR-99BrKwIFVDk9KejO9uSXrQ68w382Ye9634vaXVz8SuTLLLbxYwPlPtBT2w3hcel7qtc-Cd8LNtfFoovW6n_Tso2MqxBu2k1ASos3BJKROUAykiZOnUaAi0yCZa6MIeUONojQpIAQdIA7DPF7aZNxs:1wHkf9:27MKkOX9sf6ym3Z7ZxruNhbeQV1uM5avIKyXjqZlZJg",
+      "expire_date": "2026-05-12T15:47:51.260Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "2vh02to8lsfsx7ipawre5cnisyxoakoq",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wZINF:vJZdDkfrKBfdmnwvNOSBnbl8eSGIiFwuaME6jzCzqKo",
+      "expire_date": "2026-06-30T01:13:53.302Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "60aibj2qccnugrjh11uyhrhmwzdui1oh",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln-YoeSPmewdtdrHEC2lE-FuDtESgHtm5n3Egm2taZt4TlNWVyEFqffDYEe3HaQ79BuXVJv6zyh3BV50EWOPfPzerh_BxWW-q3JxiFYBs7O6ahwcMjW2-gJSqTI3tNZmwCY9WCoEFhDqILCwkVFpcX7A-4lOFg:1sLnSm:j0HQkjbNxWzfywH481e3iiy2qq08knrwB1ZLaagwRb0",
+      "expire_date": "2024-07-08T17:26:44.741Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "8uz30xlgepw2lcm083u45ox67a6af749",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wKaev:g_YpY_tmWYTrp3txvhxvf3jU1-EOHzyL4m8BnM8ljH4",
+      "expire_date": "2026-05-20T11:43:21.771Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "agp2ri8vkzo9w1kinrds1bit6ld9ybvz",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wP7tD:YEl00s7MyaucLZh3SFFNXYBsLuE07VzifJgLAbL-Cq0",
+      "expire_date": "2026-06-02T00:00:51.579Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "c1wpjs3qq236dfgzg1tgek3flzxvekq0",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGlkb29l1KOk5g7XrDw6gRIqTCnF3iJQC2jcz76UCb2sNW8tLGJM6q06dfjfh-MjTDtKdp9us4zytyyh6V_RBm77OKT8vh_t3ULnVb20zGc_DYMFAGYABe0E2gMW6DgEpoXEgHSETRSeJYubCsS9e2BOq9we2ujds:1vw1So:VL7e8gen38EJqcfDzqzbzUSmSSwD-mOzd56lfsVVh2E",
+      "expire_date": "2026-03-13T17:17:18.843Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "cpe6vh7zsh8mk70dctkiq3wk9dnvefus",
+    "fields": {
+      "session_data": ".eJxVjEEOwiAQAP_C2RCgbGE9eu8bCAuLVA1NSnsy_t006UGvM5N5ixD3rYa98xrmLK5Ci8svo5ie3A6RH7HdF5mWtq0zySORp-1yWjK_bmf7N6ix12M7uGjcCKQGypZwAMbsgbRNRfmRC7L1DotDlQDBaGd0QU9cRjDGefH5AstTNww:1vw1TM:3LFjwWkza_pDbf1AZUmJrftVpETUHFtJ-gvFlNWS6I8",
+      "expire_date": "2026-03-13T17:17:52.252Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "fgigqqlre5mrpmmq300z385s69xcgdwn",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln-YoeSPmewdtdrHEC2lE-FuDtESgHtm5n3Egm2taZt4TlNWVyEFqffDYEe3HaQ79BuXVJv6zyh3BV50EWOPfPzerh_BxWW-q3JxiFYBs7O6ahwcMjW2-gJSqTI3tNZmwCY9WCoEFhDqILCwkVFpcX7A-4lOFg:1sVx5W:in5DI8MWFfqHmDnlx0MmxosvWqf31MVXNHqDywmdngc",
+      "expire_date": "2024-08-05T17:44:42.461Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "gp2d1b04bcbavns29mkrxi09jhwjl057",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wZxOn:MjQXEpLXa9JtK7JOp7riCdtmFHXIE5DKzpg7oRRxm70",
+      "expire_date": "2026-07-01T21:02:13.934Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "htpa4uu1kab0nwvstek8t7maxepneke5",
+    "fields": {
+      "session_data": ".eJxVzM0OwiAQBOB34WwIf4WuR-99BrKwIFVDk9KejO9uSXrQ68w382Ye9634vaXVz8SuTLLLbxYwPlPtBT2w3hcel7qtc-Cd8LNtfFoovW6n_Tso2MqxBu2k1ASos3BJKROUAykiZOnUaAi0yCZa6MIeUONojQpIAQdIA7DPF7aZNxs:1wI3WF:rkHcmg7ImoKGNdsxt6fRoIkxSRL5AIUTnZeIaF1H7S0",
+      "expire_date": "2026-05-13T11:55:55.024Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "kd26mwo8ptvnhwobqjf98k2jafx5h02p",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln-YoeSPmewdtdrHEC2lE-FuDtESgHtm5n3Egm2taZt4TlNWVyEFqffDYEe3HaQ79BuXVJv6zyh3BV50EWOPfPzerh_BxWW-q3JxiFYBs7O6ahwcMjW2-gJSqTI3tNZmwCY9WCoEFhDqILCwkVFpcX7A-4lOFg:1siv9E:6pqbY5DtxpUL-kUHZUoEAbu9Bf9BwN77PXRJ8qRR36c",
+      "expire_date": "2024-09-10T12:18:08.259Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "nvci9wqm2sp79ua07o02uga6fqnk6m3n",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1w7kFT:mniTmBfaQXePfHj6HJeOnyVwepR3GPNwpHyHt7YEps0",
+      "expire_date": "2026-04-15T01:19:59.062Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "omsrtuyqje3lsntksueat0y6a1o1wro1",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wWcsZ:63ecWxdQYm_u9C8Wr-_osM6EuP4Rw2nuYT30FKq0YeE",
+      "expire_date": "2026-06-22T16:31:11.401Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "qgr8qak1oy6u5cyu1jf12gfwcvwsjps0",
+    "fields": {
+      "session_data": ".eJxVzM0OwiAQBOB34WwIf4WuR-99BrKwIFVDk9KejO9uSXrQ68w382Ye9634vaXVz8SuTLLLbxYwPlPtBT2w3hcel7qtc-Cd8LNtfFoovW6n_Tso2MqxBu2k1ASos3BJKROUAykiZOnUaAi0yCZa6MIeUONojQpIAQdIA7DPF7aZNxs:1wI360:6B-OABKBO-mLX0dDEfPB-D58t-Ky1v_QWcWhY7bk6J0",
+      "expire_date": "2026-05-13T11:28:48.885Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "r2a6b8bmfkfqup1d0wrop8e4xpbg77t0",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wCLrv:xWsmNazgGJUNPjxIn57C4f0_uX30fJzDdA3CocDtP5I",
+      "expire_date": "2026-04-27T18:18:43.934Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "rlivgxksgl6pwi98mlsk0gzwsr8lu1i2",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wCywo:CcQxpeq5avEPswktG95RSACXdt97Yi26E6EXSQoQzY8",
+      "expire_date": "2026-04-29T12:02:22.640Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "s0ks1sppnez5ntgqv8fdaztgqsq3mrgo",
+    "fields": {
+      "session_data": ".eJxVzM0OwiAQBOB34WwIf4WuR-99BrKwIFVDk9KejO9uSXrQ68w382Ye9634vaXVz8SuTLLLbxYwPlPtBT2w3hcel7qtc-Cd8LNtfFoovW6n_Tso2MqxBu2k1ASos3BJKROUAykiZOnUaAi0yCZa6MIeUONojQpIAQdIA7DPF7aZNxs:1wI30i:jaFaA7-UFIaUtASzTZV76GaNT5NgSpfmuC7R6dcM7jk",
+      "expire_date": "2026-05-13T11:23:20.240Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "urz5uj4fga5jvk3fyvetujubq4bb69k7",
+    "fields": {
+      "session_data": ".eJxVzEEOwiAQheG7zNoQYCh0unTvGZqBAamaNintynh306QL3b7_y3vDyPtWx73ldZwEBjBw-d0ip2eejyAPnu-LSsu8rVNUB1Fnbeq2SH5dT_t3ULlVGIAwGINCjEWHbK2LNpDRiYoJtndCqItLng7hDQpy752NLJE7yh3B5wu2mTcb:1wICGU:wj_C7n0eUYUKF7fc1ZNUi_j2nDRYj6-6rGZ7eMLvNtQ",
+      "expire_date": "2026-05-13T21:16:14.448Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "yjwv42hyi55wpakgz1o8ls91ty7eqe1u",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln-YoeSPmewdtdrHEC2lE-FuDtESgHtm5n3Egm2taZt4TlNWVyEFqffDYEe3HaQ79BuXVJv6zyh3BV50EWOPfPzerh_BxWW-q3JxiFYBs7O6ahwcMjW2-gJSqTI3tNZmwCY9WCoEFhDqILCwkVFpcX7A-4lOFg:1sJdUV:rY8hd_2m2u3YGGz5LW3BFQGgHfshutei7gPRDpzv9kY",
+      "expire_date": "2024-07-02T18:23:35.702Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "yp2u83wx96pvpie9qpy79bnzz14thsun",
+    "fields": {
+      "session_data": ".eJxVjEEOwiAQAP_C2RCgbGE9eu8bCAuLVA1NSnsy_t006UGvM5N5ixD3rYa98xrmLK5Ci8svo5ie3A6RH7HdF5mWtq0zySORp-1yWjK_bmf7N6ix12M7uGjcCKQGypZwAMbsgbRNRfmRC7L1DotDlQDBaGd0QU9cRjDGefH5AstTNww:1w0OKd:oTfBYiEHAAaeGocamXBwWC45MMqeGVMCW14-PRhSh-0",
+      "expire_date": "2026-03-25T18:30:55.069Z"
+    }
+  },
+  {
+    "model": "uploader.image",
+    "pk": 12,
+    "fields": {
+      "attachment_key": "bc342465-ad85-4f0e-8bb4-5d6eb1ebc200",
+      "public_id": "aff38e0c-5cd0-4eef-9215-9353d4f83e8f",
+      "file": "media/images/aff38e0c-5cd0-4eef-9215-9353d4f83e8f_eoiwcn",
+      "description": "schultzandrericardo@gmail.com",
+      "uploaded_on": "2026-06-08T19:20:49.161Z"
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$rVQSjixD35DrvRSBfouBWC$XloYMS8NimoxTslTgt0vOWa381wqY/VyrTtzXPx2kpI=",
+      "last_login": "2026-06-17T21:02:13.924Z",
+      "is_superuser": true,
+      "email": "a@a.com",
+      "full_name": null,
+      "cpf": "",
+      "phone": null,
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": true,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 21,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$UgwICi0bB88loAJKjoEHUh$UUUvjOLMk4neEtvXFlB+k+JtvkF9EWJHsM4SgFT02CA=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "joao@joao.com",
+      "full_name": "João Siwert Schultz",
+      "cpf": "78746352712",
+      "phone": "67483726173",
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 22,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$46R8dyVeoTjWg6RT09VebC$bxnbgpZExDITGuecFh7ZclTd/DYH532kLLiQGumDQ8E=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "renanlima123@gmail.com",
+      "full_name": "Renan de Lima Pereira",
+      "cpf": "13298745239",
+      "phone": "11934567890",
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 23,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$VIkJV8ox7KQocGZldu3Bx2$VjkAEbBWnw5v9kvXkq8TxGXk3pGXLinhd69aALKowDs=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "brenoot0405@gmail.com",
+      "full_name": "Breno Otávio Rohregger",
+      "cpf": "12345678900",
+      "phone": "47984542516",
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 25,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$2qJ4dOwnozkWlqMbOlpf5J$4MnHlEfP0C3z0jC0w/nJdl7QiJKxeaeprcxFXbIeKgQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "teste@walker.com",
+      "full_name": "Teste Walker",
+      "cpf": "98374857635",
+      "phone": "67485736453",
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 26,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$BCqbwQbNg5xvbCHKsJMWRv$vV7kF0mhLABXDEgmulhQVqayCAwJL/Zm59GYK4uCZqk=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "teste@sitter.com",
+      "full_name": "Teste Sitter",
+      "cpf": "78475672643",
+      "phone": "26736487564",
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 32,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$KlCzefTveQhZFL9Nqc7mHA$c2Ss16q5PCaZbTQqCzLIVLDQpLWGfi5XKzbdFebhdXQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "schultzandrericardo@gmail.com",
+      "full_name": "André Ricardo Schultz",
+      "cpf": "09456717925",
+      "phone": "47991940327",
+      "profile_picture": 12,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.user",
+    "pk": 33,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$kf3qvJUIGym4lh97n1CpMq$/hRHyOfx8kLi2PilOzu4ShoLkxMRCQRhRoIhgeU6uGA=",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "gaby.tom.ltr@gmail.com",
+      "full_name": "Gabrielly Tomelin Lother",
+      "cpf": "",
+      "phone": null,
+      "profile_picture": null,
+      "is_active": true,
+      "is_staff": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "core.servicetype",
+    "pk": 1,
+    "fields": {
+      "name": "Dog Walker",
+      "description": "Profissional passeador de cães que exercita, socializa e estimula o pet mentalmente, quando o tutor não tiver tempo."
+    }
+  },
+  {
+    "model": "core.servicetype",
+    "pk": 2,
+    "fields": {
+      "name": "Dog Sitter",
+      "description": "Profissional que cuida de cães e outros pets na casa do tutor ou em sua própria residência quando os donos estão ausentes, viajando ou sem tempo"
+    }
+  },
+  {
+    "model": "core.service",
+    "pk": 4,
+    "fields": {
+      "pet": 3,
+      "provider": 14,
+      "service_type": 2,
+      "start_datetime": "2026-06-10T15:00:00Z",
+      "end_datetime": "2026-06-10T21:00:00Z",
+      "status": "pending",
+      "price": "280.00",
+      "created_at": "2026-06-08T16:34:57.461Z"
+    }
+  },
+  {
+    "model": "core.providerprofile",
+    "pk": 13,
+    "fields": {
+      "user": 21,
+      "fixed_latitude": "-26.293207",
+      "fixed_longitude": "-48.845499",
+      "last_latitude": null,
+      "last_longitude": null,
+      "service_type": 1,
+      "price_per_hour": "40.00",
+      "price_per_day": null,
+      "description": null,
+      "is_active": true,
+      "created_at": "2026-04-17T16:25:08.005Z"
+    }
+  },
+  {
+    "model": "core.providerprofile",
+    "pk": 14,
+    "fields": {
+      "user": 22,
+      "fixed_latitude": "-26.360115",
+      "fixed_longitude": "-48.808935",
+      "last_latitude": null,
+      "last_longitude": null,
+      "service_type": 2,
+      "price_per_hour": "70.00",
+      "price_per_day": null,
+      "description": null,
+      "is_active": false,
+      "created_at": "2026-04-17T16:30:07.080Z"
+    }
+  },
+  {
+    "model": "core.providerprofile",
+    "pk": 16,
+    "fields": {
+      "user": 26,
+      "fixed_latitude": "-26.394721",
+      "fixed_longitude": "-48.738722",
+      "last_latitude": null,
+      "last_longitude": null,
+      "service_type": 2,
+      "price_per_hour": "78.00",
+      "price_per_day": null,
+      "description": null,
+      "is_active": true,
+      "created_at": "2026-05-11T17:08:42.184Z"
+    }
+  },
+  {
+    "model": "core.providerprofile",
+    "pk": 17,
+    "fields": {
+      "user": 25,
+      "fixed_latitude": "-26.346250",
+      "fixed_longitude": "-48.835254",
+      "last_latitude": null,
+      "last_longitude": null,
+      "service_type": 1,
+      "price_per_hour": "50.00",
+      "price_per_day": null,
+      "description": null,
+      "is_active": false,
+      "created_at": "2026-05-19T00:15:39.663Z"
+    }
+  },
+  {
+    "model": "core.providerprofile",
+    "pk": 22,
+    "fields": {
+      "user": 32,
+      "fixed_latitude": "-26.395181",
+      "fixed_longitude": "-48.737402",
+      "last_latitude": null,
+      "last_longitude": null,
+      "service_type": 1,
+      "price_per_hour": "76.90",
+      "price_per_day": null,
+      "description": null,
+      "is_active": true,
+      "created_at": "2026-06-08T19:21:13.042Z"
+    }
+  },
+  {
+    "model": "core.clientprofile",
+    "pk": 6,
+    "fields": {
+      "user": 23,
+      "last_latitude": null,
+      "last_longitude": null,
+      "created_at": "2026-04-17T17:18:33.123Z"
+    }
+  },
+  {
+    "model": "core.clientprofile",
+    "pk": 7,
+    "fields": {
+      "user": 33,
+      "last_latitude": null,
+      "last_longitude": null,
+      "created_at": "2026-06-16T01:21:56.435Z"
+    }
+  },
+  {
+    "model": "core.pet",
+    "pk": 3,
+    "fields": {
+      "owner": 6,
+      "name": "Bobby",
+      "breed": "Vira-lata",
+      "size": "m",
+      "weight": "15.000",
+      "notes": "",
+      "vaccination_status": "p",
+      "created_at": "2026-04-29T21:18:37.061Z",
+      "pet_picture": null
+    }
+  },
+  {
+    "model": "core.review",
+    "pk": 1,
+    "fields": {
+      "provider": 22,
+      "client": 7,
+      "rating": 4,
+      "comment": "Ele fez um trabalho ótimo, só não gostei pois não foi pontual para chegar e fazer o serviçi, mas de resto, fez tudo perfeitamente bem",
+      "created_at": "2026-06-16T01:25:06.635Z"
+    }
+  },
+  {
+    "model": "core.review",
+    "pk": 2,
+    "fields": {
+      "provider": 13,
+      "client": 6,
+      "rating": 5,
+      "comment": "Teste review",
+      "created_at": "2026-06-17T21:03:43.214Z"
+    }
+  },
+  {
+    "model": "core.review",
+    "pk": 3,
+    "fields": {
+      "provider": 13,
+      "client": 7,
+      "rating": 4,
+      "comment": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "created_at": "2026-06-17T21:21:00.321Z"
+    }
   }
-},
-{
-  "model": "core.user",
-  "pk": 2,
-  "fields": {
-    "password": "pbkdf2_sha256$1000000$gDw2xQZgwFkYpidganQBRU$8lNQVIM3rCWmyLCdPM0a3pcSHLmLYRZfhg1/snempV0=",
-    "last_login": null,
-    "is_superuser": true,
-    "email": "marcoandre@gmail.com",
-    "name": "Marco André Lopes Mendes",
-    "is_active": true,
-    "is_staff": true,
-    "groups": [],
-    "user_permissions": []
-  }
-}
 ]
