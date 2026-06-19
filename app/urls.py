@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import (
@@ -12,14 +14,38 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from core.views import UserRegistrationView, UserViewSet
+from core.views import (
+    ClientViewSet,
+    GlobalSearchView,
+    PetViewSet,
+    ProfileView,
+    ProviderViewSet,
+    ReviewViewSet,
+    ServiceTypeViewSet,
+    ServiceViewSet,
+    UserRegistrationView,
+    UserViewSet,
+)
+from core.views.payment import PaymentViewSet
+from uploader.router import router as uploader_router
 
 router = DefaultRouter()
 
-router.register(r'usuarios', UserViewSet, basename='usuarios')
+
+router.register(r'clients', ClientViewSet, basename='clients')
+router.register(r'pets', PetViewSet, basename='pets')
+router.register(r'providers', ProviderViewSet, basename='providers')
+router.register(r'services', ServiceViewSet, basename='services')
+router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
+router.register(r'users', UserViewSet, basename='users')
+router.register(r'payments', PaymentViewSet, basename='payment')
+router.register(r'reviews', ReviewViewSet, basename='reviews')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Uploader
+    path('api/media/', include(uploader_router.urls)),
     # OpenAPI 3
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path(
@@ -37,7 +63,11 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Registro de usuários
-    path('api/registro/', UserRegistrationView.as_view(), name='user_registration'),
+    path('api/register/', UserRegistrationView.as_view(), name='user_registration'),
+    path('api/profile/', ProfileView.as_view(), name='user_profile'),
+    # Busca
+    path('api/search/', GlobalSearchView.as_view(), name='search'),
     # API
     path('api/', include(router.urls)),
 ]
+urlpatterns += static(settings.MEDIA_ENDPOINT, document_root=settings.MEDIA_ROOT)

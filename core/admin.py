@@ -13,10 +13,10 @@ class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
 
     ordering = ['id']
-    list_display = ['email', 'name']
+    list_display = ['email', 'full_name']
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        (_('Personal Info'), {'fields': ('name',)}),
+        (None, {'fields': ('profile_picture', 'email', 'password')}),
+        (_('Personal Info'), {'fields': ('full_name',)}),
         (
             _('Permissions'),
             {
@@ -38,10 +38,11 @@ class UserAdmin(BaseUserAdmin):
             {
                 'classes': ('wide',),
                 'fields': (
+                    'profile_picture',
                     'email',
                     'password1',
                     'password2',
-                    'name',
+                    'full_name',
                     'is_active',
                     'is_staff',
                     'is_superuser',
@@ -51,4 +52,10 @@ class UserAdmin(BaseUserAdmin):
     )
 
 
+admin.site.register(models.ClientProfile)
+admin.site.register(models.ProviderProfile)
+admin.site.register(models.Pet)
+admin.site.register(models.Service)
+admin.site.register(models.ServiceType)
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Review)
