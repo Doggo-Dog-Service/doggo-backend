@@ -2,6 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from core.models import Review
 from core.serializers import (
+    ReviewCreateUpdateSerializer,
     ReviewDetailSerializer,
     ReviewSerializer,
 )
@@ -13,7 +14,8 @@ class ReviewViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ReviewDetailSerializer
-
+        if self.action in {'create', 'update', 'partial_update'}:
+            return ReviewCreateUpdateSerializer
         return ReviewSerializer
 
     def get_queryset(self):
