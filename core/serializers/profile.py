@@ -66,15 +66,16 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 
 class ProviderDetailSerializer(serializers.ModelSerializer):
-    reviews = ReviewDetailSerializer(
-        many=True,
-        read_only=True,
-    )
+    email = serializers.CharField(source='user.email', read_only=True)
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = ProviderProfile
         fields = (
             'id',
             'user',
+            'email',
+            'profile_picture',
             'fixed_latitude',
             'fixed_longitude',
             'last_latitude',
@@ -86,6 +87,10 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'description',
             'is_active',
             'created_at',
-            'reviews',
+            'reviews'
         )
-        depth = 2
+
+    def get_profile_picture(self, obj):
+        if obj.user.profile_picture:
+            return obj.user.profile_picture.url
+        return None

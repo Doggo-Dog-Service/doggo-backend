@@ -15,3 +15,13 @@ class ReviewViewSet(ModelViewSet):
             return ReviewDetailSerializer
 
         return ReviewSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        provider_id = self.request.query_params.get('provider_id')
+
+        if provider_id:
+            queryset = queryset.filter(provider=provider_id)
+
+        return queryset

@@ -22,7 +22,6 @@ class Pet(models.Model):
     size = models.CharField(max_length=1, choices=Size.choices)
     weight = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
-    vaccination_status = models.CharField(max_length=1, choices=VaccinationStatus.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     pet_picture = models.ForeignKey(
         Image,

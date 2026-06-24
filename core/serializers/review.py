@@ -61,3 +61,4 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             'comment',
             'created_at',
         )
+        depth = 1
