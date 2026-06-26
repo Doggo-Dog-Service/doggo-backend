@@ -1,3 +1,4 @@
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Service, ServiceType
@@ -25,3 +26,8 @@ class ServiceTypeViewSet(ModelViewSet):
         if self.action == 'create':
             return ServiceTypeRegisterSerializer
         return ServiceTypeSerializer
+
+    def get_permissions(self):
+        if self.action in {'list', 'retrieve'}:
+            return [AllowAny()]
+        return [IsAuthenticated()]
