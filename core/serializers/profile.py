@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from rest_framework import serializers
 
 from core.models import ClientProfile, ProviderProfile
@@ -41,6 +42,7 @@ class ClientDetailSerializer(serializers.ModelSerializer):
 class ProviderSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     service_type_detail = ServiceTypeInformationSerializer(source='service_type', read_only=True)
+    classification = serializers.SerializerMethodField()
 
     class Meta:
         model = ProviderProfile
@@ -56,6 +58,7 @@ class ProviderSerializer(serializers.ModelSerializer):
             'price_per_hour',
             'price_per_day',
             'description',
+            'classification',
             'is_active',
             'created_at',
         )
@@ -63,6 +66,12 @@ class ProviderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+    def get_classification(self, obj):
+        classification = obj.reviews.aggregate(
+            classification=Avg('rating')
+        )['classification']
+        return classification
 
 
 class ProviderDetailSerializer(serializers.ModelSerializer):
