@@ -32,7 +32,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = (
             'id',
-            'provider',
             'client_name',
             'client_picture',
             'rating',
