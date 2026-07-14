@@ -28,17 +28,37 @@ class ReviewClientSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    client_name = serializers.CharField(source='client.user.full_name')
+    client_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = Review
         fields = (
             'id',
-            'provider',
-            'client',
+            'client_name',
+            'client_picture',
             'rating',
             'comment',
             'created_at',
         )
-        read_only_fields = ('id', 'client', 'created_at',)
+        read_only_fields = ('id', 'created_at',)
+
+    def get_client_picture(self, obj):
+        if obj.client.user.profile_picture:
+            return obj.client.user.profile_picture.url
+        return None
+
+
+class ReviewCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = (
+            'provider',
+            'client',
+            'rating',
+            'comment'
+        )
+        read_only_fields = ('client', )
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -49,6 +69,16 @@ class ReviewSerializer(serializers.ModelSerializer):
                 'Usuário não possui perfil de Cliente'
             )
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+
+        if instance.client.user.id == user.id:
+            return super().update(instance, validated_data)
+
+        raise serializers.ValidationError(
+            'Você não tem permissão para fazer mudanças nesse comentário'
+        )
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
@@ -64,3 +94,4 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             'comment',
             'created_at',
         )
+        depth = 1

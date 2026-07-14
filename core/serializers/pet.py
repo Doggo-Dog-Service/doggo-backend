@@ -26,7 +26,6 @@ class PetSerializer(serializers.ModelSerializer):
             'size',
             'weight',
             'notes',
-            'vaccination_status',
             'created_at',
             'pet_picture',
             'pet_picture_attachment_key',
@@ -56,7 +55,6 @@ class PetDetailSerializer(serializers.ModelSerializer):
             'size',
             'weight',
             'notes',
-            'vaccination_status',
             'created_at',
             'pet_picture',
         )

@@ -1,7 +1,13 @@
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import ClientProfile, ProviderProfile
-from core.serializers import ClientDetailSerializer, ClientSerializer, ProviderDetailSerializer, ProviderSerializer
+from core.serializers import (
+    ClientDetailSerializer,
+    ClientSerializer,
+    ProviderDetailSerializer,
+    ProviderRegisterSerializer,
+    ProviderSerializer,
+)
 
 
 class ClientViewSet(ModelViewSet):
@@ -19,6 +25,8 @@ class ProviderViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ProviderDetailSerializer
+        elif self.action in {'create', 'update', 'partial_update'}:
+            return ProviderRegisterSerializer
         return ProviderSerializer
 
     def get_queryset(self):

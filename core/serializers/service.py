@@ -57,7 +57,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             price = provider.price_per_hour * hours
         elif provider.price_per_day:
             days = duration.days or 1
-            price = provider.price_per_day * days
+            price = provider.price_per_day * Decimal(days)
         else:
             raise serializers.ValidationError('O Provedor não possui preço definido')
 
@@ -86,15 +86,3 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceType
         fields = ('id', 'name', 'description', 'providers', 'services')
-
-
-class ServiceTypeRegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ServiceType
-        fields = ('name', 'description')
-
-
-class ServiceTypeInformationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ServiceType
-        fields = ('id', 'name')

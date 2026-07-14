@@ -2,8 +2,6 @@ from django.db.models import Avg
 from rest_framework import serializers
 
 from core.models import ClientProfile, ProviderProfile
-from core.serializers.review import ReviewDetailSerializer
-from core.serializers.service import ServiceTypeInformationSerializer
 from core.serializers.user import UserSerializer
 
 
@@ -12,13 +10,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientProfile
-        fields = (
-            'id',
-            'user',
-            'last_latitude',
-            'last_longitude',
-            'created_at'
-        )
+        fields = ('id', 'user', 'last_latitude', 'last_longitude', 'created_at')
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
@@ -28,38 +20,48 @@ class ClientSerializer(serializers.ModelSerializer):
 class ClientDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientProfile
-        fields = (
-            'id',
-            'user',
-            'pets',
-            'last_latitude',
-            'last_longitude',
-            'created_at'
-        )
+        fields = ('id', 'user', 'pets', 'last_latitude', 'last_longitude', 'created_at')
         depth = 1
 
 
 class ProviderSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    service_type_detail = ServiceTypeInformationSerializer(source='service_type', read_only=True)
-    classification = serializers.SerializerMethodField()
+    service_type_name = serializers.CharField(source='service_type.name', read_only=True)
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = ProviderProfile
         fields = (
             'id',
-            'user',
+            'profile_picture',
+            'full_name',
+            'service_type_name',
+            'price_per_hour',
+            'price_per_day',
+            'fixed_latitude',
+            'fixed_longitude',
+            'is_active',
+            'created_at',
+        )
+
+    def get_profile_picture(self, obj):
+        if obj.user.profile_picture:
+            return obj.user.profile_picture.url
+        return None
+
+
+class ProviderRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProviderProfile
+        fields = (
             'fixed_latitude',
             'fixed_longitude',
             'last_latitude',
             'last_longitude',
             'service_type',
-            'service_type_detail',
             'price_per_hour',
             'price_per_day',
             'description',
-            'classification',
-            'is_active',
             'created_at',
         )
 
@@ -75,19 +77,22 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 
 class ProviderDetailSerializer(serializers.ModelSerializer):
-    reviews = ReviewDetailSerializer(
-        many=True,
-        read_only=True,
-    )
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    phone = serializers.CharField(source='user.phone', read_only=True)
+    profile_picture = serializers.SerializerMethodField()
+
     class Meta:
         model = ProviderProfile
         fields = (
             'id',
             'user',
+            'full_name',
+            'email',
+            'phone',
+            'profile_picture',
             'fixed_latitude',
             'fixed_longitude',
-            'last_latitude',
-            'last_longitude',
             'service_type',
             'price_per_hour',
             'price_per_day',
@@ -97,4 +102,8 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'reviews',
         )
-        depth = 2
+
+    def get_profile_picture(self, obj):
+        if obj.user.profile_picture:
+            return obj.user.profile_picture.url
+        return None
