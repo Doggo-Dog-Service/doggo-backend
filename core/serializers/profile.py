@@ -83,6 +83,7 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source='user.email', read_only=True)
     phone = serializers.CharField(source='user.phone', read_only=True)
     profile_picture = serializers.SerializerMethodField()
+    service_type_name = serializers.CharField(source='service_type.name', read_only=True)
 
     class Meta:
         model = ProviderProfile
@@ -95,7 +96,7 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'profile_picture',
             'fixed_latitude',
             'fixed_longitude',
-            'service_type',
+            'service_type_name',
             'price_per_hour',
             'price_per_day',
             'services',
