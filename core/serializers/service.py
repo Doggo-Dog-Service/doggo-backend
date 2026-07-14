@@ -86,3 +86,9 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceType
         fields = ('id', 'name', 'description', 'providers', 'services')
+
+
+class ServiceTypeRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceType
+        fields = ('name', 'description')
