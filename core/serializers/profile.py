@@ -25,6 +25,7 @@ class ClientDetailSerializer(serializers.ModelSerializer):
 
 
 class ProviderSerializer(serializers.ModelSerializer):
+    classification = serializers.SerializerMethodField()
     service_type_name = serializers.CharField(source='service_type.name', read_only=True)
     full_name = serializers.CharField(source='user.full_name', read_only=True)
     profile_picture = serializers.SerializerMethodField()
@@ -40,6 +41,7 @@ class ProviderSerializer(serializers.ModelSerializer):
             'price_per_day',
             'fixed_latitude',
             'fixed_longitude',
+            'classification',
             'is_active',
             'created_at',
         )
@@ -48,6 +50,12 @@ class ProviderSerializer(serializers.ModelSerializer):
         if obj.user.profile_picture:
             return obj.user.profile_picture.url
         return None
+
+    def get_classification(self, obj):
+        classification = obj.reviews.aggregate(
+            classification=Avg('rating')
+        )['classification']
+        return classification
 
 
 class ProviderRegisterSerializer(serializers.ModelSerializer):
@@ -68,12 +76,6 @@ class ProviderRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
-
-    def get_classification(self, obj):
-        classification = obj.reviews.aggregate(
-            classification=Avg('rating')
-        )['classification']
-        return classification
 
 
 class ProviderDetailSerializer(serializers.ModelSerializer):
