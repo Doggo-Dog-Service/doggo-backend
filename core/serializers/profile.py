@@ -27,6 +27,7 @@ class ProviderSerializer(serializers.ModelSerializer):
     service_type_name = serializers.CharField(source='service_type.name', read_only=True)
     full_name = serializers.CharField(source='user.full_name', read_only=True)
     profile_picture = serializers.SerializerMethodField()
+    classification = serializers.SerializerMethodField()
 
     class Meta:
         model = ProviderProfile
@@ -40,12 +41,23 @@ class ProviderSerializer(serializers.ModelSerializer):
             'fixed_latitude',
             'fixed_longitude',
             'is_active',
+            'classification',
             'created_at',
         )
 
     def get_profile_picture(self, obj):
         if obj.user.profile_picture:
             return obj.user.profile_picture.url
+        return None
+
+    def get_classification(self, obj):
+        reviews = obj.reviews.all()
+        if reviews:
+            total = 0
+            for review in reviews:
+                total += review.rating
+            media = total / len(reviews)
+            return f'{media:.1f}'
         return None
 
 
@@ -70,6 +82,7 @@ class ProviderRegisterSerializer(serializers.ModelSerializer):
 
 
 class ProviderDetailSerializer(serializers.ModelSerializer):
+    service_type_name = serializers.CharField(source='service_type.name', read_only=True)
     full_name = serializers.CharField(source='user.full_name', read_only=True)
     email = serializers.CharField(source='user.email', read_only=True)
     phone = serializers.CharField(source='user.phone', read_only=True)
@@ -87,6 +100,7 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'fixed_latitude',
             'fixed_longitude',
             'service_type',
+            'service_type_name',
             'price_per_hour',
             'price_per_day',
             'services',
