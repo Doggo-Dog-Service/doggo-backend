@@ -1,20 +1,11 @@
 from rest_framework import serializers
-from rest_framework.serializers import SlugRelatedField
 
 from core.models import ClientProfile, Pet
-from uploader.models import Image
 from uploader.serializers import ImageSerializer
 
 
 class PetSerializer(serializers.ModelSerializer):
-    pet_picture_attachment_key = SlugRelatedField(
-        source='pet_picture',
-        queryset=Image.objects.all(),
-        slug_field='attachment_key',
-        required=False,
-        write_only=True,
-    )
-    pet_picture = ImageSerializer(required=False, read_only=True)
+    pet_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = Pet
@@ -28,7 +19,6 @@ class PetSerializer(serializers.ModelSerializer):
             'notes',
             'created_at',
             'pet_picture',
-            'pet_picture_attachment_key',
         )
         read_only_fields = ('id', 'owner', 'created_at')
 
@@ -41,6 +31,12 @@ class PetSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Usuário não possui perfil de Cliente')
 
         return super().create(validated_data)
+
+    def get_pet_picture(self, obj):
+        if not obj.pet_picture:
+            return None
+
+        return obj.pet_picture.url
 
 
 class PetDetailSerializer(serializers.ModelSerializer):
