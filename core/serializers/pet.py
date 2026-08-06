@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.models import ClientProfile, Pet
+from uploader.models import Image
 from uploader.serializers import ImageSerializer
 
 
@@ -39,8 +40,22 @@ class PetSerializer(serializers.ModelSerializer):
         return obj.pet_picture.url
 
 
+class PetRegisterUpdateSerializer(serializers.ModelSerializer):
+    pet_picture = serializers.SlugRelatedField(
+        queryset=Image.objects.all(),
+        slug_field='attachment_key',
+        required=False,
+        write_only=True,
+    )
+
+    class Meta:
+        model = Pet
+        fields = ('pet_picture', 'name', 'breed', 'size', 'weight', 'notes')
+
+
 class PetDetailSerializer(serializers.ModelSerializer):
     pet_picture = ImageSerializer(required=False)
+
     class Meta:
         model = Pet
         fields = (

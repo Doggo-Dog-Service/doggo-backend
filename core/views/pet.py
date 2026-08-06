@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Pet
-from core.serializers import PetDetailSerializer, PetSerializer
+from core.serializers import PetDetailSerializer, PetRegisterUpdateSerializer, PetSerializer
 
 
 class PetViewSet(ModelViewSet):
@@ -10,6 +10,8 @@ class PetViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return PetDetailSerializer
+        elif self.action in {'create', 'update', 'partial_update'}:
+            return PetRegisterUpdateSerializer
         return PetSerializer
 
     def get_queryset(self):
