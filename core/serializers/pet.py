@@ -23,16 +23,6 @@ class PetSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('id', 'owner', 'created_at')
 
-    def create(self, validated_data):
-        user = self.context['request'].user
-
-        try:
-            validated_data['owner'] = user.client_profile
-        except ClientProfile.DoesNotExist:
-            raise serializers.ValidationError('Usuário não possui perfil de Cliente')
-
-        return super().create(validated_data)
-
     def get_pet_picture(self, obj):
         if not obj.pet_picture:
             return None
@@ -50,7 +40,18 @@ class PetRegisterUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pet
-        fields = ('pet_picture', 'name', 'breed', 'size', 'weight', 'notes')
+        fields = ('pet_picture', 'owner', 'name', 'breed', 'size', 'weight', 'notes')
+        read_only_fields = ('owner',)
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+
+        try:
+            validated_data['owner'] = user.client_profile
+        except ClientProfile.DoesNotExist:
+            raise serializers.ValidationError('Usuário não possui perfil de Cliente')
+
+        return super().create(validated_data)
 
 
 class PetDetailSerializer(serializers.ModelSerializer):
