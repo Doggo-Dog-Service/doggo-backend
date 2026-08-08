@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.serializers import SlugRelatedField
 
 from core.models import ClientProfile, Pet
 from uploader.models import Image
@@ -7,14 +6,7 @@ from uploader.serializers import ImageSerializer
 
 
 class PetSerializer(serializers.ModelSerializer):
-    pet_picture_attachment_key = SlugRelatedField(
-        source='pet_picture',
-        queryset=Image.objects.all(),
-        slug_field='attachment_key',
-        required=False,
-        write_only=True,
-    )
-    pet_picture = ImageSerializer(required=False, read_only=True)
+    pet_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = Pet
@@ -26,12 +18,30 @@ class PetSerializer(serializers.ModelSerializer):
             'size',
             'weight',
             'notes',
-            'vaccination_status',
             'created_at',
             'pet_picture',
-            'pet_picture_attachment_key',
         )
         read_only_fields = ('id', 'owner', 'created_at')
+
+    def get_pet_picture(self, obj):
+        if not obj.pet_picture:
+            return None
+
+        return obj.pet_picture.url
+
+
+class PetRegisterUpdateSerializer(serializers.ModelSerializer):
+    pet_picture = serializers.SlugRelatedField(
+        queryset=Image.objects.all(),
+        slug_field='attachment_key',
+        required=False,
+        write_only=True,
+    )
+
+    class Meta:
+        model = Pet
+        fields = ('pet_picture', 'owner', 'name', 'breed', 'size', 'weight', 'notes')
+        read_only_fields = ('owner',)
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -46,6 +56,7 @@ class PetSerializer(serializers.ModelSerializer):
 
 class PetDetailSerializer(serializers.ModelSerializer):
     pet_picture = ImageSerializer(required=False)
+
     class Meta:
         model = Pet
         fields = (
@@ -56,7 +67,6 @@ class PetDetailSerializer(serializers.ModelSerializer):
             'size',
             'weight',
             'notes',
-            'vaccination_status',
             'created_at',
             'pet_picture',
         )
