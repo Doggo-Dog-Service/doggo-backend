@@ -29,6 +29,7 @@ class ProviderSerializer(serializers.ModelSerializer):
     service_type_name = serializers.CharField(source='service_type.name', read_only=True)
     full_name = serializers.CharField(source='user.full_name', read_only=True)
     profile_picture = serializers.SerializerMethodField()
+    distance = serializers.SerializerMethodField()
 
     class Meta:
         model = ProviderProfile
@@ -42,6 +43,7 @@ class ProviderSerializer(serializers.ModelSerializer):
             'fixed_latitude',
             'fixed_longitude',
             'classification',
+            'distance',
             'is_active',
             'created_at',
         )
@@ -56,6 +58,9 @@ class ProviderSerializer(serializers.ModelSerializer):
             classification=Avg('rating')
         )['classification']
         return classification
+
+    def get_distance(self, obj):
+        return getattr(obj, 'distance', None)
 
 
 class ProviderRegisterSerializer(serializers.ModelSerializer):
