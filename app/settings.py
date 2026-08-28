@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'corsheaders',
+    'channels',
     'django_extensions',
     'django_filters',
     'drf_spectacular',
@@ -74,6 +75,22 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'app.wsgi.application'
+ASGI_APPLICATION = 'app.asgi.application'
+
+# Configuração do Redis / Django Channels
+REDIS_URL = os.getenv(
+    'REDIS_URL',
+    'redis://127.0.0.1:6379',
+)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_URL]
+        }
+    }
+}
 
 # Banco de dados
 DATABASES = {
