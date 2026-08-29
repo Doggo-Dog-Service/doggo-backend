@@ -27,6 +27,8 @@ dependencies = [
   'whitenoise[brotli]>=6.6.0',
   "channels>=4.3.2",
   "channels-redis>=4.3.0",
+  "websockets>=16.1.1",
+  "daphne>=4.2.3",
 ]
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -40,7 +42,7 @@ dev = [
 
 [tool.pdm.scripts]
 pre_dev = "python ./scripts/set_my_ip.py"
-dev = "python manage.py runserver 127.0.0.1:8000"
+dev = "daphne -b 127.0.0.1 -p 8000 app.asgi:application"
 createsuperuser = "python manage.py createsuperuser"
 pre_migrate = "python manage.py makemigrations"
 migrate = "python manage.py migrate"

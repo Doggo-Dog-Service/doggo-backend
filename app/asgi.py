@@ -1,20 +1,24 @@
 import os
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE",
+    "app.settings",
+)
+
 from django.core.asgi import get_asgi_application
-
-from core.routing import websocket_urlpatterns
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 
 django_asgi_application = get_asgi_application()
 
-application = ProtocolTypeRouter({
-    'http': django_asgi_application,
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            websocket_urlpatterns
-        )
-    )
-})
+from channels.auth import AuthMiddlewareStack  # noqa: E402
+from channels.routing import ProtocolTypeRouter, URLRouter  # noqa: E402
+
+from core.routing import websocket_urlpatterns  # noqa: E402
+
+application = ProtocolTypeRouter(
+    {
+        "http": django_asgi_application,
+        "websocket": AuthMiddlewareStack(
+            URLRouter(websocket_urlpatterns)
+        ),
+    }
+)
