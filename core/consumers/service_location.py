@@ -57,19 +57,15 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             redis=self.redis
         )
 
-        if self.role == "client":
-            await self.channel_layer.group_add(
-                self.group_name,
-                self.channel_name,
-            )
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name,
+        )
 
         await self.accept()
 
     async def disconnect(self, close_code):
-        if (
-            hasattr(self, "group_name")
-            and getattr(self, "role", None) == "client"
-        ):
+        if hasattr(self, "group_name"):
             await self.channel_layer.group_discard(
                 self.group_name,
                 self.channel_name,
@@ -158,6 +154,17 @@ class ServiceConsumer(AsyncWebsocketConsumer):
                 {
                     "type": "location",
                     "location": event["location"],
+                }
+            )
+        )
+
+    async def service_event(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": event["event_type"],
+                    "service_id": event["service_id"],
+                    "status": event["status"],
                 }
             )
         )

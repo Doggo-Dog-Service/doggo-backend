@@ -1,4 +1,8 @@
+from django.db import transaction
+from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Service, ServiceType
@@ -8,6 +12,7 @@ from core.serializers import (
     ServiceTypeRegisterSerializer,
     ServiceTypeSerializer,
 )
+from core.services import publish_service_event
 
 
 class ServiceViewSet(ModelViewSet):
@@ -17,6 +22,97 @@ class ServiceViewSet(ModelViewSet):
         if self.action in {'create', 'update', 'partial_update'}:
             return ServiceCreateUpdateSerializer
         return ServiceListSerializer
+
+    @action(detail=True, methods=["post"])
+    def start(self, request, pk=None):
+        service = self.get_object()
+
+        if service.provider.user != request.user:
+            return Response(
+                {"detail": "Apenas o prestador pode iniciar o passeio."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if Service.Status(int(service.status)) != Service.Status.CONFIRMED:
+            return Response(
+                {"detail": f"Não é possível iniciar: status atual é {service.get_status_display()}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            service.status = Service.Status.IN_PROGRESS
+            service.save(update_fields=["status"])
+
+            transaction.on_commit(
+                lambda: publish_service_event(
+                    service.id, "walk_started", Service.Status.IN_PROGRESS
+                )
+            )
+
+        return Response(ServiceListSerializer(service).data)
+
+    @action(detail=True, methods=["post"])
+    def complete(self, request, pk=None):
+        service = self.get_object()
+
+        if service.provider.user != request.user:
+            return Response(
+                {"detail": "Apenas o prestador pode concluir o passeio."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if Service.Status(int(service.status)) != Service.Status.IN_PROGRESS:
+            return Response(
+                {"detail": "Apenas passeios em andamento podem ser concluídos."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            service.status = Service.Status.COMPLETED
+            service.save(update_fields=["status"])
+
+            transaction.on_commit(
+                lambda: publish_service_event(
+                    service.id, "walk_completed", Service.Status.COMPLETED
+                )
+            )
+
+        return Response(ServiceListSerializer(service).data)
+
+    @action(detail=True, methods=["post"])
+    def cancel(self, request, pk=None):
+        service = self.get_object()
+
+        user = request.user
+        if service.provider.user != user and service.client.user != user:
+            return Response(
+                {"detail": "Apenas o prestador ou o cliente podem cancelar."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        cancellable = {
+            Service.Status.IN_REVIEW,
+            Service.Status.CONFIRMED,
+            Service.Status.IN_PROGRESS,
+        }
+
+        if Service.Status(int(service.status)) not in cancellable:
+            return Response(
+                {"detail": f"Não é possível cancelar: status atual é {service.get_status_display()}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            service.status = Service.Status.CANCELLED
+            service.save(update_fields=["status"])
+
+            transaction.on_commit(
+                lambda: publish_service_event(
+                    service.id, "walk_cancelled", Service.Status.CANCELLED
+                )
+            )
+
+        return Response(ServiceListSerializer(service).data)
 
 
 class ServiceTypeViewSet(ModelViewSet):
