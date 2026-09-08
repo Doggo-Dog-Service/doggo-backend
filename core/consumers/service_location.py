@@ -1,6 +1,9 @@
 import json
 
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
 from redis.asyncio import Redis
 
@@ -10,20 +13,28 @@ from ..services import LocationService
 
 class ServiceConsumer(AsyncWebsocketConsumer):
 
+    MIN_LATITUDE = -90
+    MIN_LONGITUDE = -180
+    MAX_LATITUDE = 90
+    MAX_LONGITUDE = 180
+
     async def connect(self):
-        self.service_id = self.scope["url_route"]["kwargs"]["service_id"]
+        self.service_id = self.scope[
+            "url_route"
+        ]["kwargs"]["service_id"]
 
         self.group_name = (
             f"service_{self.service_id}"
         )
 
-        self.redis = Redis.from_url(
-            self._get_redis_url()
-        )
+        user = self.scope["user"]
 
-        self.location_service = LocationService(
-            redis=self.redis
-        )
+        if (
+            isinstance(user, AnonymousUser)
+            or not user.is_authenticated
+        ):
+            await self.close(code=4001)
+            return
 
         try:
             self.service = await self._get_service()
@@ -32,24 +43,48 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             await self.close(code=4004)
             return
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name,
+        self.role = await self._get_user_role()
+
+        if self.role is None:
+            await self.close(code=4003)
+            return
+
+        self.redis = Redis.from_url(
+            settings.REDIS_URL
         )
+
+        self.location_service = LocationService(
+            redis=self.redis
+        )
+
+        if self.role == "client":
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name,
+            )
 
         await self.accept()
 
     async def disconnect(self, close_code):
-        if hasattr(self, "group_name"):
+        if (
+            hasattr(self, "group_name")
+            and getattr(self, "role", None) == "client"
+        ):
             await self.channel_layer.group_discard(
                 self.group_name,
                 self.channel_name,
             )
 
         if hasattr(self, "redis"):
-            await self.redis.close()
+            await self.redis.aclose()
 
     async def receive(self, text_data):
+        if self.role != "provider":
+            await self.send_error(
+                "Apenas o prestador pode enviar localização."
+            )
+            return
+
         try:
             data = json.loads(text_data)
 
@@ -61,13 +96,13 @@ class ServiceConsumer(AsyncWebsocketConsumer):
 
         message_type = data.get("type")
 
-        if message_type == "location":
-            await self.handle_location(data)
+        if message_type != "location":
+            await self.send_error(
+                "Tipo de mensagem desconhecido."
+            )
             return
 
-        await self.send_error(
-            "Tipo de mensagem desconhecido."
-        )
+        await self.handle_location(data)
 
     async def handle_location(self, data):
         latitude = data.get("latitude")
@@ -89,10 +124,24 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             )
             return
 
-        location = await self.location_service.process_location(
-            service=self.service,
-            latitude=latitude,
-            longitude=longitude,
+        if not self.MIN_LATITUDE <= latitude <= self.MAX_LATITUDE:
+            await self.send_error(
+                "Latitude inválida."
+            )
+            return
+
+        if not self.MIN_LONGITUDE <= longitude <= self.MAX_LONGITUDE:
+            await self.send_error(
+                "Longitude inválida."
+            )
+            return
+
+        location = await (
+            self.location_service.process_location(
+                service=self.service,
+                latitude=latitude,
+                longitude=longitude,
+            )
         )
 
         await self.channel_layer.group_send(
@@ -123,19 +172,23 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def _get_service(self):
-        from asgiref.sync import sync_to_async  # noqa: PLC0415
-
-        return await sync_to_async(
-            Service.objects.select_related(
-                "provider"
-            ).get
-        )(
+    @sync_to_async
+    def _get_service(self):
+        return Service.objects.select_related(
+            "provider__user",
+            "client__user",
+        ).get(
             id=self.service_id
         )
 
-    @staticmethod
-    def _get_redis_url():
-        from django.conf import settings  # noqa: PLC0415
+    @sync_to_async
+    def _get_user_role(self):
+        user = self.scope["user"]
 
-        return settings.REDIS_URL
+        if self.service.provider.user == user:
+            return "provider"
+
+        if self.service.client.user == user:
+            return "client"
+
+        return None
