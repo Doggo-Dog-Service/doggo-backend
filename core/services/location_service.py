@@ -28,12 +28,29 @@ class LocationService:
             ).isoformat(),
         }
 
+        # Última localização recebida pelo WebSocket.
+        last_location = (
+            await self.redis_service.get_last_location(
+                service.id
+            )
+        )
+
+        # Última localização persistida no banco.
         last_saved_location = (
             await self.redis_service.get_last_saved_location(
                 service.id
             )
         )
 
+        # Calcula e atualiza a distância percorrida.
+        distance = await self._process_distance(
+            service.id,
+            last_location,
+            current_location,
+        )
+
+        # Verifica se a localização atual deve
+        # ser persistida no banco.
         should_save = await self._should_save_location(
             last_saved_location,
             current_location,
@@ -51,12 +68,71 @@ class LocationService:
                 current_location,
             )
 
+        # Atualiza a última localização recebida.
         await self.redis_service.save_location(
             service.id,
             current_location,
         )
 
-        return current_location
+        return {
+            "location": current_location,
+            "distance": distance,
+        }
+
+    async def _process_distance(
+        self,
+        service_id,
+        last_location,
+        current_location,
+    ):
+        """
+        Calcula a distância entre a última localização
+        recebida e a localização atual e adiciona esse
+        trecho à distância total do passeio.
+        """
+
+        # Primeiro ponto do passeio.
+        if last_location is None:
+            distance = 0.0
+
+            await self.redis_service.save_distance(
+                service_id,
+                distance,
+            )
+
+            return distance
+
+        # Recupera a distância acumulada.
+        distance = (
+            await self.redis_service.get_distance(
+                service_id
+            )
+        )
+
+        # Caso a chave não exista no Redis,
+        # inicia a distância em zero.
+        if distance is None:
+            distance = 0.0
+
+        # Calcula somente o trecho entre o último
+        # ponto recebido e o ponto atual.
+        segment_distance = self._calculate_distance(
+            last_location["latitude"],
+            last_location["longitude"],
+            current_location["latitude"],
+            current_location["longitude"],
+        )
+
+        # Adiciona o novo trecho à distância total.
+        distance += segment_distance
+
+        # Atualiza a distância acumulada no Redis.
+        await self.redis_service.save_distance(
+            service_id,
+            distance,
+        )
+
+        return distance
 
     async def _should_save_location(
         self,

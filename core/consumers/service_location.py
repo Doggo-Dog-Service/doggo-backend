@@ -57,15 +57,19 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             redis=self.redis
         )
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name,
-        )
+        if self.role in {"client", "provider"}:
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name,
+            )
 
         await self.accept()
 
     async def disconnect(self, close_code):
-        if hasattr(self, "group_name"):
+        if (
+            hasattr(self, "group_name")
+            and getattr(self, "role", None) in {"client", "provider"}
+        ):
             await self.channel_layer.group_discard(
                 self.group_name,
                 self.channel_name,
@@ -132,7 +136,7 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             )
             return
 
-        location = await (
+        result = await (
             self.location_service.process_location(
                 service=self.service,
                 latitude=latitude,
@@ -144,7 +148,8 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             self.group_name,
             {
                 "type": "location_update",
-                "location": location,
+                "location": result["location"],
+                "distance": result["distance"],
             },
         )
 
@@ -154,6 +159,7 @@ class ServiceConsumer(AsyncWebsocketConsumer):
                 {
                     "type": "location",
                     "location": event["location"],
+                    "distance": event["distance"],
                 }
             )
         )

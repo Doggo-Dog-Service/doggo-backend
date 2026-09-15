@@ -14,6 +14,7 @@ class PetServiceSerializer(serializers.ModelSerializer):
             'id',
             'pet_picture',
             'name',
+            'breed',
         )
 
     def get_pet_picture(self, obj):

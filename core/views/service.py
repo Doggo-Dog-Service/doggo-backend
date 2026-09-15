@@ -84,7 +84,7 @@ class ServiceViewSet(ModelViewSet):
         service = self.get_object()
 
         user = request.user
-        if service.provider.user != user and service.client.user != user:
+        if service.provider.user != user and service.client.user != user:  # noqa: PLR1714
             return Response(
                 {"detail": "Apenas o prestador ou o cliente podem cancelar."},
                 status=status.HTTP_403_FORBIDDEN,
