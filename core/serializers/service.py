@@ -1,8 +1,8 @@
-from decimal import Decimal
-
+from django.utils import timezone
 from rest_framework import serializers
 
 from core.models import Pet, Service, ServiceType
+from core.services import booking
 
 
 class PetServiceSerializer(serializers.ModelSerializer):
@@ -32,6 +32,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
     provider_picture = serializers.SerializerMethodField()
     service_type = serializers.CharField(source='service_type.name')
     pets = PetServiceSerializer(many=True, read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:
         model = Service
@@ -47,6 +48,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'pets',
             'price',
             'status',
+            'status_label',
             'start_datetime',
             'end_datetime',
             'created_at'
@@ -66,9 +68,12 @@ class ServiceListSerializer(serializers.ModelSerializer):
 
 
 class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
+    end_datetime = serializers.DateTimeField(required=True)
+
     class Meta:
         model = Service
         fields = (
+            'id',
             'pets',
             'provider',
             'client',
@@ -79,12 +84,54 @@ class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
             'price',
             'created_at',
         )
-        read_only_fields = ('id', 'client', 'price', 'status', 'created_at')
+        read_only_fields = ('id', 'client', 'status', 'price', 'created_at')
 
     def validate(self, data):
-        if data['end_datetime'] <= data['start_datetime']:
+        start = self._value(data, 'start_datetime')
+        end = self._value(data, 'end_datetime')
+
+        if start is None or end is None:
+            raise serializers.ValidationError('Informe o horário inicial e o horário final')
+        if end <= start:
             raise serializers.ValidationError('O horário final tem que ser maior que o inicial')
+        if timezone.localtime(start) <= booking.local_now():
+            raise serializers.ValidationError('O início deve ser no futuro')
+
+        provider = self._value(data, 'provider')
+        if provider is None:
+            raise serializers.ValidationError('Informe o prestador')
+
+        service_type = self._value(data, 'service_type')
+        if service_type is not None and service_type != provider.service_type:
+            raise serializers.ValidationError('Tipo de serviço incompatível com o prestador')
+
+        self._validate_pets(data, provider)
+
+        if not booking.fits_in_availability(provider, start, end):
+            raise serializers.ValidationError('O horário escolhido não está disponível para este prestador')
+
         return data
+
+    def _value(self, data, field):
+        return data.get(field, getattr(self.instance, field, None))
+
+    def _validate_pets(self, data, provider):
+        if self.instance is None:
+            client = getattr(self.context['request'].user, 'client_profile', None)
+            if client is None:
+                raise serializers.ValidationError('Somente clientes podem criar solicitações de serviço')
+            if provider.user == self.context['request'].user:
+                raise serializers.ValidationError('Você não pode agendar um serviço com você mesmo')
+            owner = client
+        elif 'pets' not in data:
+            return
+        else:
+            owner = self.instance.client
+
+        if not data.get('pets'):
+            raise serializers.ValidationError('Informe ao menos um pet')
+        if any(pet.owner != owner for pet in data['pets']):
+            raise serializers.ValidationError('Você só pode agendar com seus pets')
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -97,19 +144,9 @@ class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
         start = validated_data['start_datetime']
         end = validated_data['end_datetime']
 
-        duration = end - start
-        hours = Decimal(duration.total_seconds()) / Decimal(3600)
-
-        if provider.price_per_hour:
-            price = provider.price_per_hour * hours
-        elif provider.price_per_day:
-            days = duration.days or 1
-            price = provider.price_per_day * Decimal(days)
-        else:
-            raise serializers.ValidationError('O Provedor não possui preço definido')
-
-        validated_data['price'] = price.quantize(Decimal('0.01'))
+        validated_data['price'] = booking.compute_price(provider, start, end)
         validated_data['client'] = client
+        validated_data['status'] = Service.Status.IN_REVIEW
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -117,18 +154,7 @@ class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
         start = validated_data.get('start_datetime', instance.start_datetime)
         end = validated_data.get('end_datetime', instance.end_datetime)
 
-        duration = end - start
-        hours = Decimal(duration.total_seconds()) / Decimal(3600)
-
-        if provider.price_per_hour:
-            price = provider.price_per_hour * hours
-        elif provider.price_per_day:
-            days = duration.days or 1
-            price = provider.price_per_day * Decimal(days)
-        else:
-            raise serializers.ValidationError('O Provedor não possui preço definido')
-
-        validated_data['price'] = price.quantize(Decimal('0.01'))
+        validated_data['price'] = booking.compute_price(provider, start, end)
         return super().update(instance, validated_data)
 
 
