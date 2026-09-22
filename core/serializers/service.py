@@ -28,9 +28,13 @@ class ServiceListSerializer(serializers.ModelSerializer):
     client_id = serializers.IntegerField(source='client.id')
     client_name = serializers.CharField(source='client.user.full_name')
     client_picture = serializers.SerializerMethodField()
+    client_latitude = serializers.SerializerMethodField()
+    client_longitude = serializers.SerializerMethodField()
     provider_id = serializers.IntegerField(source='provider.id')
     provider_name = serializers.CharField(source='provider.user.full_name')
     provider_picture = serializers.SerializerMethodField()
+    provider_latitude = serializers.SerializerMethodField()
+    provider_longitude = serializers.SerializerMethodField()
     service_type = serializers.CharField(source='service_type.name')
     pets = PetServiceSerializer(many=True, read_only=True)
 
@@ -41,9 +45,13 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'client_id',
             'client_name',
             'client_picture',
+            'client_latitude',
+            'client_longitude',
             'provider_id',
             'provider_name',
             'provider_picture',
+            'provider_latitude',
+            'provider_longitude',
             'service_type',
             'pets',
             'price',
@@ -64,6 +72,22 @@ class ServiceListSerializer(serializers.ModelSerializer):
         if profile_picture:
             return profile_picture.url
         return None
+
+    def get_client_latitude(self, obj):
+        if obj.client.last_latitude is not None:
+            return float(obj.client.last_latitude)
+        return None
+
+    def get_client_longitude(self, obj):
+        if obj.client.last_longitude is not None:
+            return float(obj.client.last_longitude)
+        return None
+
+    def get_provider_latitude(self, obj):
+        return float(obj.provider.fixed_latitude)
+
+    def get_provider_longitude(self, obj):
+        return float(obj.provider.fixed_longitude)
 
 
 class ServiceCreateUpdateSerializer(serializers.ModelSerializer):

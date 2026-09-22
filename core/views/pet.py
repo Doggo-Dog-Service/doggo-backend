@@ -17,9 +17,9 @@ class PetViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        owner_id = self.request.query_params.get('owner_id')
+        owner = self.request.query_params.get('owner')
 
-        if owner_id:
-            queryset = queryset.filter(owner=owner_id)
+        if owner:
+            queryset = queryset.filter(owner=owner)
 
         return queryset

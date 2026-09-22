@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
-from math import atan2, cos, radians, sin, sqrt
 
 from ..repositories import LocationRepository
+from ..utils.geo import haversine
 from .redis_service import RedisService
 
 
@@ -116,7 +116,7 @@ class LocationService:
 
         # Calcula somente o trecho entre o último
         # ponto recebido e o ponto atual.
-        segment_distance = self._calculate_distance(
+        segment_distance = haversine(
             last_location["latitude"],
             last_location["longitude"],
             current_location["latitude"],
@@ -183,7 +183,7 @@ class LocationService:
         last_saved_location,
         current_location,
     ):
-        distance = self._calculate_distance(
+        distance = haversine(
             last_saved_location["latitude"],
             last_saved_location["longitude"],
             current_location["latitude"],
@@ -191,37 +191,3 @@ class LocationService:
         )
 
         return distance >= self.SAVE_DISTANCE_METERS
-
-    @staticmethod
-    def _calculate_distance(
-        latitude_1,
-        longitude_1,
-        latitude_2,
-        longitude_2,
-    ):
-        earth_radius = 6371000
-
-        latitude_1 = radians(latitude_1)
-        latitude_2 = radians(latitude_2)
-
-        delta_latitude = radians(
-            latitude_2 - latitude_1
-        )
-
-        delta_longitude = radians(
-            longitude_2 - longitude_1
-        )
-
-        a = (
-            sin(delta_latitude / 2) ** 2
-            + cos(latitude_1)
-            * cos(latitude_2)
-            * sin(delta_longitude / 2) ** 2
-        )
-
-        c = 2 * atan2(
-            sqrt(a),
-            sqrt(1 - a),
-        )
-
-        return earth_radius * c

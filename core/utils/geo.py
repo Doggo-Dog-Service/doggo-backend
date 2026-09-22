@@ -1,5 +1,29 @@
+from math import asin, cos, radians, sin, sqrt
+
 from django.db.models import ExpressionWrapper, F, FloatField, Value
 from django.db.models.functions import ASin, Cos, Least, Radians, Sin, Sqrt
+
+
+def haversine(latitude_1, longitude_1, latitude_2, longitude_2):
+    """
+    Calcula a distância em metros entre dois pontos geográficos.
+    """
+    earth_radius = 6371000.0
+
+    latitude_1 = radians(latitude_1)
+    latitude_2 = radians(latitude_2)
+
+    delta_latitude = radians(latitude_2 - latitude_1)
+    delta_longitude = radians(longitude_2 - longitude_1)
+
+    a = (
+        sin(delta_latitude / 2) ** 2
+        + cos(latitude_1) * cos(latitude_2) * sin(delta_longitude / 2) ** 2
+    )
+
+    c = 2 * asin(sqrt(a))
+
+    return earth_radius * c
 
 
 def haversine_annotation(lat, lon, lat_field='fixed_latitude', lon_field='fixed_longitude'):
