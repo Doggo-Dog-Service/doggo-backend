@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
@@ -19,7 +20,15 @@ from core.utils.geo import haversine
 
 
 class ServiceViewSet(ModelViewSet):
-    queryset = Service.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            return Service.objects.all()
+
+        return Service.objects.filter(
+            Q(client__user=user) | Q(provider__user=user)
+        ).distinct()
 
     def get_serializer_class(self):
         if self.action in {'create', 'update', 'partial_update'}:
