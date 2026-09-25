@@ -1,10 +1,3 @@
-"""Regras ausiliares do agendamento (Etapa 2).
-
-Funções puras e reutilizáveis: geração de slots por data, checagem de
-disponibilidade/sobreposição e cálculo de preço. `Service` permanece a
-entidade única de agendamento — nenhum model novo.
-"""
-
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -13,8 +6,6 @@ from rest_framework.exceptions import ValidationError
 
 from core.models import ProviderAvailability, Service
 
-# Estados que ocupam/bloqueiam o horário concreto. Solicitações em análise já
-# reservam o horário no POST; confirmados e em andamento continuam bloqueando.
 BLOCKING_STATUSES = [
     Service.Status.IN_REVIEW,
     Service.Status.CONFIRMED,
@@ -30,18 +21,15 @@ REJECTED_STATUS = str(Service.Status.REJECTED)
 
 
 def local_now():
-    """Datetime atual no fuso local configurado (America/Sao_Paulo)."""
     return timezone.localtime(timezone.now())
 
 
 def combine_local(date, time_of_day):
-    """Combina uma data e um horário em um datetime aware no fuso local."""
     tz = timezone.get_current_timezone()
     return datetime.combine(date, time_of_day, tzinfo=tz)
 
 
 def availability_intervals(provider, date):
-    """Intervalos (aware) de disponibilidade do provider em `date`."""
     intervals = (
         ProviderAvailability.objects.filter(provider=provider, weekday=date.weekday())
         .order_by('start_time')
@@ -53,12 +41,6 @@ def availability_intervals(provider, date):
 
 
 def generate_slots(provider, date, duration):
-    """Slots disponíveis para uma data, com passos da duração do serviço.
-
-    Só são retornados slots futuros; a duração precisa caber inteira dentro de
-    um intervalo da disponibilidade recorrente e o slot não pode sobrepor um
-    agendamento que bloqueia a agenda.
-    """
     intervals = availability_intervals(provider, date)
     if not intervals:
         return []
@@ -91,10 +73,6 @@ def format_slot(dt):
 
 
 def fits_in_availability(provider, start, end):
-    """True se [start, end) couber inteiro dentro da disponibilidade do dia.
-
-    Serviços que atravessam a meia-noite (mudança de data local) não são suportados.
-    """
     local_start = timezone.localtime(start)
     local_end = timezone.localtime(end)
 
@@ -108,10 +86,6 @@ def fits_in_availability(provider, start, end):
 
 
 def conflicting_services(provider, start, end, exclude_pk=None):
-    """Services ativos que sobrepõem o intervalo [start, end) do provider.
-
-    Regra de sobreposição close-right: `start < existente.end AND end > existente.start`.
-    """
     queryset = Service.objects.filter(
         provider=provider,
         status__in=BLOCKING_STATUSES,
@@ -129,11 +103,6 @@ def has_conflict(provider, start, end, exclude_pk=None):
 
 
 def compute_price(provider, start, end):
-    """Preço calculado pelo backend (fonte de verdade).
-
-    `price_per_hour × horas`; senão `price_per_day × dias (or 1)`; erro 400 se o
-    provider não tiver preço. Horas fracionadas são aceitas.
-    """
     duration = end - start
     if duration <= timedelta(0):
         raise ValidationError('O horário final tem que ser maior que o inicial')
