@@ -1,3 +1,4 @@
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Pet
@@ -5,8 +6,6 @@ from core.serializers import PetDetailSerializer, PetRegisterUpdateSerializer, P
 
 
 class PetViewSet(ModelViewSet):
-    queryset = Pet.objects.all()
-
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return PetDetailSerializer
@@ -15,11 +14,15 @@ class PetViewSet(ModelViewSet):
         return PetSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        user = self.request.user
 
-        owner_id = self.request.query_params.get('owner_id')
+        if user.is_superuser:
+            queryset = Pet.objects.all()
+            return queryset
 
-        if owner_id:
-            queryset = queryset.filter(owner=owner_id)
+        if not hasattr(user, 'client_profile'):
+            raise PermissionDenied(
+                'O usuário precisa ter um perfil de cliente para acessar os pets.'
+            )
 
-        return queryset
+        return Pet.objects.filter(owner=user.client_profile)
