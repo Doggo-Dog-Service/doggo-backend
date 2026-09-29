@@ -2,16 +2,118 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from core.models import Service, ServiceType
+from core.models import Pet, Service, ServiceType
+
+from ..utils.geo import haversine
 
 
-class ServiceSerializer(serializers.ModelSerializer):
+class PetServiceSerializer(serializers.ModelSerializer):
+    pet_picture = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pet
+        fields = (
+            'id',
+            'pet_picture',
+            'name',
+            'breed',
+        )
+
+    def get_pet_picture(self, obj):
+        pet_picture = obj.pet_picture
+        if pet_picture:
+            return pet_picture.url
+        return None
+
+
+class ServiceListSerializer(serializers.ModelSerializer):
+    client_id = serializers.IntegerField(source='client.id')
+    client_name = serializers.CharField(source='client.user.full_name')
+    client_picture = serializers.SerializerMethodField()
+    provider_id = serializers.IntegerField(source='provider.id')
+    provider_name = serializers.CharField(source='provider.user.full_name')
+    provider_picture = serializers.SerializerMethodField()
+    service_type = serializers.CharField(source='service_type.name')
+    duration = serializers.SerializerMethodField()
+    distance = serializers.SerializerMethodField()
+    pets = PetServiceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Service
         fields = (
             'id',
-            'pet',
+            'client_id',
+            'client_name',
+            'client_picture',
+            'provider_id',
+            'provider_name',
+            'provider_picture',
+            'service_type',
+            'pets',
+            'price',
+            'status',
+            'start_datetime',
+            'end_datetime',
+            'started_at',
+            'duration',
+            'distance',
+            'created_at'
+        )
+
+    def get_client_picture(self, obj):
+        profile_picture = obj.client.user.profile_picture
+        if profile_picture:
+            return profile_picture.url
+        return None
+
+    def get_provider_picture(self, obj):
+        profile_picture = obj.provider.user.profile_picture
+        if profile_picture:
+            return profile_picture.url
+        return None
+
+    def get_duration(self, obj):
+        if not obj.started_at or not obj.end_datetime:
+            return None
+
+        duration = obj.end_datetime - obj.started_at
+
+        total_seconds = int(duration.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    def get_distance(self, obj):
+        locations = obj.locations.order_by('created_at')
+
+        if not locations.exists():
+            return None
+
+        total = 0
+        last = None
+
+        for location in locations:
+            if last is not None:
+                diference = haversine(
+                    last.latitude,
+                    last.longitude,
+                    location.latitude,
+                    location.longitude
+                )
+
+                total += diference
+            last = location
+        return round(total, 2)
+
+
+class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = (
+            'pets',
             'provider',
+            'client',
             'service_type',
             'start_datetime',
             'end_datetime',
@@ -19,7 +121,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'price',
             'created_at',
         )
-        read_only_fields = ('id', 'price', 'status', 'created_at')
+        read_only_fields = ('id', 'client', 'price', 'status', 'created_at')
 
     def validate(self, data):
         if data['end_datetime'] <= data['start_datetime']:
@@ -27,6 +129,12 @@ class ServiceSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        user = self.context['request'].user
+        client = getattr(user, 'client_profile', None)
+
+        if client is None:
+            raise serializers.ValidationError('Somente clientes podem criar solicitações de serviço')
+
         provider = validated_data['provider']
         start = validated_data['start_datetime']
         end = validated_data['end_datetime']
@@ -43,6 +151,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('O Provedor não possui preço definido')
 
         validated_data['price'] = price.quantize(Decimal('0.01'))
+        validated_data['client'] = client
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -63,23 +172,6 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         validated_data['price'] = price.quantize(Decimal('0.01'))
         return super().update(instance, validated_data)
-
-
-class ServiceDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Service
-        fields = (
-            'id',
-            'pet',
-            'provider',
-            'service_type',
-            'start_datetime',
-            'end_datetime',
-            'status',
-            'price',
-            'created_at',
-        )
-        depth = 1
 
 
 class ServiceTypeSerializer(serializers.ModelSerializer):

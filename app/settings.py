@@ -26,6 +26,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # Aplicações instaladas
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'corsheaders',
+    'channels',
     'django_extensions',
     'django_filters',
     'drf_spectacular',
@@ -74,6 +76,27 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'app.wsgi.application'
+ASGI_APPLICATION = 'app.asgi.application'
+
+# Configuração do Redis / Django Channels
+REDIS_URL = os.getenv(
+    'REDIS_URL',
+    'redis://127.0.0.1:6379',
+)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                {
+                    'address': REDIS_URL,
+                    'socket_timeout': None,
+                }
+            ]
+        }
+    }
+}
 
 # Banco de dados
 DATABASES = {
