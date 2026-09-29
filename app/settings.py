@@ -21,8 +21,8 @@ ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:8000',
-    'https://doggo-frontend.vercel.app/',
-    'https://doggo-backend.class.fabricadesoftware.ifc.edu.br/'
+    'https://doggo-frontend.vercel.app',
+    'https://doggo-backend.class.fabricadesoftware.ifc.edu.br'
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
