@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from core.models import Pet, Service, ServiceType
 
+from ..utils.geo import haversine
+
 
 class PetServiceSerializer(serializers.ModelSerializer):
     pet_picture = serializers.SerializerMethodField()
@@ -33,6 +35,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
     provider_picture = serializers.SerializerMethodField()
     service_type = serializers.CharField(source='service_type.name')
     duration = serializers.SerializerMethodField()
+    distance = serializers.SerializerMethodField()
     pets = PetServiceSerializer(many=True, read_only=True)
 
     class Meta:
@@ -53,6 +56,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'end_datetime',
             'started_at',
             'duration',
+            'distance',
             'created_at'
         )
 
@@ -79,6 +83,28 @@ class ServiceListSerializer(serializers.ModelSerializer):
         minutes, seconds = divmod(remainder, 60)
 
         return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    def get_distance(self, obj):
+        locations = obj.locations.order_by('created_at')
+
+        if not locations.exists():
+            return None
+
+        total = 0
+        last = None
+
+        for location in locations:
+            if last is not None:
+                diference = haversine(
+                    last.latitude,
+                    last.longitude,
+                    location.latitude,
+                    location.longitude
+                )
+
+                total += diference
+            last = location
+        return round(total, 2)
 
 
 class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
