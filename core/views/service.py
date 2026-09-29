@@ -112,7 +112,8 @@ class ServiceViewSet(ModelViewSet):
 
         with transaction.atomic():
             service.status = Service.Status.IN_PROGRESS
-            service.save(update_fields=["status"])
+            service.started_at = timezone.now()
+            service.save(update_fields=["status", "started_at"])
 
             transaction.on_commit(
                 lambda: publish_service_event(

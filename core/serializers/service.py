@@ -32,6 +32,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source='provider.user.full_name')
     provider_picture = serializers.SerializerMethodField()
     service_type = serializers.CharField(source='service_type.name')
+    duration = serializers.SerializerMethodField()
     pets = PetServiceSerializer(many=True, read_only=True)
 
     class Meta:
@@ -50,6 +51,8 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'status',
             'start_datetime',
             'end_datetime',
+            'started_at',
+            'duration',
             'created_at'
         )
 
@@ -64,6 +67,18 @@ class ServiceListSerializer(serializers.ModelSerializer):
         if profile_picture:
             return profile_picture.url
         return None
+
+    def get_duration(self, obj):
+        if not obj.started_at or not obj.end_datetime:
+            return None
+
+        duration = obj.end_datetime - obj.started_at
+
+        total_seconds = int(duration.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
 
 
 class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
