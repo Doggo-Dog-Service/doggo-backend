@@ -1,6 +1,6 @@
 from .pet import PetSerializer, PetDetailSerializer, PetRegisterUpdateSerializer
 from .profile import ClientDetailSerializer, ClientSerializer, ProviderDetailSerializer, ProviderSerializer, ProviderRegisterSerializer
-from .service import ServiceSerializer, ServiceDetailSerializer, ServiceTypeSerializer, ServiceTypeRegisterSerializer
+from .service import ServiceListSerializer, ServiceCreateUpdateSerializer, ServiceTypeSerializer, ServiceTypeRegisterSerializer
 from .user import UserProfileSerializer, UserRegistrationSerializer, UserSerializer
 from .payment import PaymentSerializer, PaymentDetailSerializer
 from .review import ReviewSerializer, ReviewDetailSerializer, ReviewCreateUpdateSerializer
