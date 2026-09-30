@@ -45,7 +45,6 @@ class ProviderAvailabilityViewSet(ModelViewSet):
         parameters=[
             OpenApiParameter('provider', int, required=True),
             OpenApiParameter('date', str, required=True),
-            OpenApiParameter('duration_minutes', int, required=True),
             OpenApiParameter('service', int, required=False),
         ],
     )
@@ -53,15 +52,12 @@ class ProviderAvailabilityViewSet(ModelViewSet):
     def slots(self, request):
         provider_id = request.query_params.get('provider')
         date_param = request.query_params.get('date')
-        duration_param = request.query_params.get('duration_minutes')
         service_id = request.query_params.get('service')
 
         if not provider_id:
             raise ValidationError('Informe o provider')
         if not date_param:
             raise ValidationError('Informe a data')
-        if not duration_param:
-            raise ValidationError('Informe a duração em minutos')
 
         try:
             provider = ProviderProfile.objects.get(pk=provider_id)
@@ -72,14 +68,6 @@ class ProviderAvailabilityViewSet(ModelViewSet):
             target = date.fromisoformat(date_param)
         except ValueError:
             raise ValidationError('Data inválida. Use o formato AAAA-MM-DD')
-
-        try:
-            duration_minutes = int(duration_param)
-        except (TypeError, ValueError):
-            raise ValidationError('Duração inválida. Use minutos inteiros')
-        if duration_minutes <= 0:
-            raise ValidationError('A duração deve ser maior que zero')
-        duration = timedelta(minutes=duration_minutes)
 
         if service_id:
             try:
@@ -92,12 +80,16 @@ class ProviderAvailabilityViewSet(ModelViewSet):
         if booking.local_now().date() > target:
             raise ValidationError('A data deve ser hoje ou futura')
 
+        # A duração vem do tipo de serviço do prestador: o cliente não informa.
+        duration_minutes = provider.service_type.duration_minutes
+        if duration_minutes <= 0:
+            raise ValidationError('O tipo de serviço deste prestador não tem duração definida')
+        duration = timedelta(minutes=duration_minutes)
+
         slots = booking.generate_slots(provider, target, duration)
-        return Response(
-            {
-                'provider': provider.id,
-                'date': target.isoformat(),
-                'duration_minutes': duration_minutes,
-                'available_slots': [booking.format_slot(slot) for slot in slots],
-            }
-        )
+        return Response({
+            'provider': provider.id,
+            'date': target.isoformat(),
+            'duration_minutes': duration_minutes,
+            'available_slots': [booking.format_slot(slot) for slot in slots],
+        })

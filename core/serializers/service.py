@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -68,7 +70,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
 
 
 class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
-    end_datetime = serializers.DateTimeField(required=True)
+    end_datetime = serializers.DateTimeField(required=False)
 
     class Meta:
         model = Service
@@ -88,18 +90,27 @@ class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         start = self._value(data, 'start_datetime')
-        end = self._value(data, 'end_datetime')
 
-        if start is None or end is None:
-            raise serializers.ValidationError('Informe o horário inicial e o horário final')
-        if end <= start:
-            raise serializers.ValidationError('O horário final tem que ser maior que o inicial')
-        if timezone.localtime(start) <= booking.local_now():
-            raise serializers.ValidationError('O início deve ser no futuro')
+        if start is None:
+            raise serializers.ValidationError('Informe o horário inicial')
 
         provider = self._value(data, 'provider')
         if provider is None:
             raise serializers.ValidationError('Informe o prestador')
+
+        # O cliente informa apenas o início; a duração vem do tipo de serviço do prestador.
+        end = self._value(data, 'end_datetime')
+        if end is None:
+            duration_minutes = provider.service_type.duration_minutes
+            if duration_minutes <= 0:
+                raise serializers.ValidationError('O tipo de serviço deste prestador não tem duração definida')
+            end = start + timedelta(minutes=duration_minutes)
+            data['end_datetime'] = end
+
+        if end <= start:
+            raise serializers.ValidationError('O horário final tem que ser maior que o inicial')
+        if timezone.localtime(start) <= booking.local_now():
+            raise serializers.ValidationError('O início deve ser no futuro')
 
         service_type = self._value(data, 'service_type')
         if service_type is not None and service_type != provider.service_type:
