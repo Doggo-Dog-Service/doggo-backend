@@ -26,9 +26,7 @@ class ServiceViewSet(ModelViewSet):
         if user.is_superuser:
             return Service.objects.all()
 
-        return Service.objects.filter(
-            Q(client__user=user) | Q(provider__user=user)
-        ).distinct()
+        return Service.objects.filter(Q(client__user=user) | Q(provider__user=user)).distinct()
 
     def get_serializer_class(self):
         if self.action in {'create', 'update', 'partial_update'}:
@@ -38,128 +36,130 @@ class ServiceViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status']
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=['post'])
+    def rate(self, request, pk=None):
+        service = self.get_object()
+
+        if service.client.user != request.user:
+            return Response(
+                {'detail': 'Apenas o cliente do serviço pode fazer avalições'}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        if service.is_rating:
+            return Response({'detail': 'Esse serviço já foi avaliado'}, status=status.HTTP_400_BAD_REQUEST)
+
+        with transaction.atomic():
+            service.is_rating = True
+            service.save(update_fields=['is_rating'])
+
+        return Response({'is_rating': True}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
         service = self.get_object()
 
         if service.provider.user != request.user:
             return Response(
-                {"detail": "Apenas o prestador pode confirmar o passeio."},
+                {'detail': 'Apenas o prestador pode confirmar o passeio.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         if Service.Status(int(service.status)) != Service.Status.IN_REVIEW:
             return Response(
-                {"detail": f"Não é possível confirmar: status atual é {service.get_status_display()}."},
+                {'detail': f'Não é possível confirmar: status atual é {service.get_status_display()}.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         with transaction.atomic():
             service.status = Service.Status.CONFIRMED
-            service.save(update_fields=["status"])
+            service.save(update_fields=['status'])
 
-            transaction.on_commit(
-                lambda: publish_service_event(
-                    service.id, "walk_confirmed", Service.Status.CONFIRMED
-                )
-            )
+            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_confirmed', Service.Status.CONFIRMED))
 
         return Response(ServiceListSerializer(service).data)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=['post'])
     def reject(self, request, pk=None):
         service = self.get_object()
 
         if service.provider.user != request.user:
             return Response(
-                {"detail": "Apenas o prestador pode recusar o passeio."},
+                {'detail': 'Apenas o prestador pode recusar o passeio.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         if Service.Status(int(service.status)) != Service.Status.IN_REVIEW:
             return Response(
-                {"detail": f"Não é possível recusar: status atual é {service.get_status_display()}."},
+                {'detail': f'Não é possível recusar: status atual é {service.get_status_display()}.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         with transaction.atomic():
             service.status = Service.Status.REJECTED
-            service.save(update_fields=["status"])
+            service.save(update_fields=['status'])
 
-            transaction.on_commit(
-                lambda: publish_service_event(
-                    service.id, "walk_rejected", Service.Status.REJECTED
-                )
-            )
+            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_rejected', Service.Status.REJECTED))
 
         return Response(ServiceListSerializer(service).data)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=['post'])
     def start(self, request, pk=None):
         service = self.get_object()
 
         if service.provider.user != request.user:
             return Response(
-                {"detail": "Apenas o prestador pode iniciar o passeio."},
+                {'detail': 'Apenas o prestador pode iniciar o passeio.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         if Service.Status(int(service.status)) != Service.Status.CONFIRMED:
             return Response(
-                {"detail": f"Não é possível iniciar: status atual é {service.get_status_display()}."},
+                {'detail': f'Não é possível iniciar: status atual é {service.get_status_display()}.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         with transaction.atomic():
             service.status = Service.Status.IN_PROGRESS
             service.started_at = timezone.now()
-            service.save(update_fields=["status", "started_at"])
+            service.save(update_fields=['status', 'started_at'])
 
-            transaction.on_commit(
-                lambda: publish_service_event(
-                    service.id, "walk_started", Service.Status.IN_PROGRESS
-                )
-            )
+            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_started', Service.Status.IN_PROGRESS))
 
         return Response(ServiceListSerializer(service).data)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         service = self.get_object()
 
         if service.provider.user != request.user:
             return Response(
-                {"detail": "Apenas o prestador pode concluir o passeio."},
+                {'detail': 'Apenas o prestador pode concluir o passeio.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         if Service.Status(int(service.status)) != Service.Status.IN_PROGRESS:
             return Response(
-                {"detail": "Apenas passeios em andamento podem ser concluídos."},
+                {'detail': 'Apenas passeios em andamento podem ser concluídos.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         with transaction.atomic():
             service.status = Service.Status.COMPLETED
             service.end_datetime = timezone.now()
-            service.save(update_fields=["status", "end_datetime"])
+            service.save(update_fields=['status', 'end_datetime'])
 
-            transaction.on_commit(
-                lambda: publish_service_event(
-                    service.id, "walk_completed", Service.Status.COMPLETED
-                )
-            )
+            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_completed', Service.Status.COMPLETED))
 
         return Response(ServiceListSerializer(service).data)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         service = self.get_object()
 
         user = request.user
         if service.provider.user != user and service.client.user != user:  # noqa: PLR1714
             return Response(
-                {"detail": "Apenas o prestador ou o cliente podem cancelar."},
+                {'detail': 'Apenas o prestador ou o cliente podem cancelar.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -171,38 +171,30 @@ class ServiceViewSet(ModelViewSet):
 
         if Service.Status(int(service.status)) not in cancellable:
             return Response(
-                {"detail": f"Não é possível cancelar: status atual é {service.get_status_display()}."},
+                {'detail': f'Não é possível cancelar: status atual é {service.get_status_display()}.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         with transaction.atomic():
             service.status = Service.Status.CANCELLED
-            service.save(update_fields=["status"])
+            service.save(update_fields=['status'])
 
-            transaction.on_commit(
-                lambda: publish_service_event(
-                    service.id, "walk_cancelled", Service.Status.CANCELLED
-                )
-            )
+            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_cancelled', Service.Status.CANCELLED))
 
         return Response(ServiceListSerializer(service).data)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=['get'])
     def route(self, request, pk=None):
         service = self.get_object()
 
         user = request.user
         if service.provider.user != user and service.client.user != user:  # noqa: PLR1714
             return Response(
-                {"detail": "Apenas os envolvidos no passeio podem ver a rota."},
+                {'detail': 'Apenas os envolvidos no passeio podem ver a rota.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        locations = list(
-            service.locations.order_by("created_at").values_list(
-                "latitude", "longitude", "created_at"
-            )
-        )
+        locations = list(service.locations.order_by('created_at').values_list('latitude', 'longitude', 'created_at'))
 
         total_distance = 0.0
         for index in range(1, len(locations)):
@@ -217,19 +209,17 @@ class ServiceViewSet(ModelViewSet):
 
         points = [
             {
-                "latitude": float(latitude),
-                "longitude": float(longitude),
-                "created_at": created_at,
+                'latitude': float(latitude),
+                'longitude': float(longitude),
+                'created_at': created_at,
             }
             for latitude, longitude, created_at in locations
         ]
 
-        return Response(
-            {
-                "points": points,
-                "total_distance": round(total_distance, 2),
-            }
-        )
+        return Response({
+            'points': points,
+            'total_distance': round(total_distance, 2),
+        })
 
 
 class ServiceTypeViewSet(ModelViewSet):

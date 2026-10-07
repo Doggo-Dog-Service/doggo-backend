@@ -57,6 +57,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'started_at',
             'duration',
             'distance',
+            'is_rating',
             'created_at'
         )
 
