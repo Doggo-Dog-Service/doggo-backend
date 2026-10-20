@@ -27,6 +27,34 @@ class UserViewSet(ModelViewSet):
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def _check_user_permission(self):
+        user = self.request.user
+        target_user = self.get_object()
+
+        if not user.is_superuser and user.id != target_user.id:
+            return Response(
+                {'detail': 'Você não tem permissão para modificar este usuário.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return None
+
+    def update(self, request, *args, **kwargs):
+        response = self._check_user_permission()
+
+        if response:
+            return response
+
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        response = self._check_user_permission()
+
+        if response:
+            return response
+
+        return super().partial_update(request, *args, **kwargs)
+
 
 class UserRegistrationView(CreateAPIView):
     """Endpoint para registro de novos usuários."""
