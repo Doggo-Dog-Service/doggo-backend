@@ -4,3 +4,4 @@ from .service import ServiceListSerializer, ServiceCreateUpdateSerializer, Servi
 from .user import UserProfileSerializer, UserRegistrationSerializer, UserSerializer
 from .payment import PaymentSerializer, PaymentDetailSerializer
 from .review import ReviewSerializer, ReviewDetailSerializer, ReviewCreateUpdateSerializer
+from .availability import ProviderAvailabilitySerializer, ProviderAvailabilityCreateUpdateSerializer

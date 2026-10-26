@@ -2,6 +2,7 @@ from django.db.models import Avg
 from rest_framework import serializers
 
 from core.models import ClientProfile, ProviderProfile
+from core.serializers.availability import ProviderAvailabilitySerializer
 from core.serializers.user import UserSerializer
 
 
@@ -89,6 +90,7 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(source='user.phone', read_only=True)
     profile_picture = serializers.SerializerMethodField()
     service_type_name = serializers.CharField(source='service_type.name', read_only=True)
+    availability = ProviderAvailabilitySerializer(many=True, read_only=True)
 
     class Meta:
         model = ProviderProfile
@@ -109,6 +111,7 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'is_active',
             'created_at',
             'reviews',
+            'availability',
         )
 
     def get_profile_picture(self, obj):

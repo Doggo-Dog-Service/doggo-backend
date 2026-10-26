@@ -19,6 +19,7 @@ from core.views import (
     GlobalSearchView,
     PetViewSet,
     ProfileView,
+    ProviderAvailabilityViewSet,
     ProviderViewSet,
     ReviewViewSet,
     ServiceTypeViewSet,
@@ -35,6 +36,7 @@ router = DefaultRouter()
 router.register(r'clients', ClientViewSet, basename='clients')
 router.register(r'pets', PetViewSet, basename='pets')
 router.register(r'providers', ProviderViewSet, basename='providers')
+router.register(r'availability', ProviderAvailabilityViewSet, basename='availability')
 router.register(r'services', ServiceViewSet, basename='services')
 router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
 router.register(r'users', UserViewSet, basename='users')
