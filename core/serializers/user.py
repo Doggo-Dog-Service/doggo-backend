@@ -59,6 +59,8 @@ class UserProfileSerializer(ModelSerializer):
             'id',
             'email',
             'full_name',
+            'cpf',
+            'phone',
             'provider_profile',
             'client_profile',
             'is_active',
