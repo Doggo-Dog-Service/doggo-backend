@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -151,7 +151,9 @@ class ServiceViewSet(ModelViewSet):
 
 
 class ServiceTypeViewSet(ModelViewSet):
-    queryset = ServiceType.objects.all()
+    """Catálogo público para leitura; só a equipe (staff) cria, altera ou remove tipos."""
+
+    queryset = ServiceType.objects.order_by('id')
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -161,4 +163,4 @@ class ServiceTypeViewSet(ModelViewSet):
     def get_permissions(self):
         if self.action in {'list', 'retrieve'}:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAdminUser()]

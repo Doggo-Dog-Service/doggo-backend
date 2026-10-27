@@ -3,5 +3,5 @@ from .profile import ClientDetailSerializer, ClientSerializer, ProviderDetailSer
 from .service import ServiceListSerializer, ServiceCreateUpdateSerializer, ServiceUpdateSerializer, ServiceRateSerializer, ServiceRoutePointSerializer, ServiceRouteSerializer, ServiceTypeSerializer, ServiceTypeRegisterSerializer
 from .user import UserProfileSerializer, UserRegistrationSerializer, UserSerializer
 from .payment import PaymentSerializer, PaymentDetailSerializer
-from .review import ReviewSerializer, ReviewDetailSerializer, ReviewCreateUpdateSerializer
+from .review import ReviewSerializer, ReviewDetailSerializer
 from .availability import ProviderAvailabilitySerializer, ProviderAvailabilityCreateUpdateSerializer

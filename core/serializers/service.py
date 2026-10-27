@@ -298,7 +298,7 @@ class ServiceRouteSerializer(serializers.Serializer):
 class ServiceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceType
-        fields = ('id', 'name', 'description', 'providers', 'services')
+        fields = ('id', 'name', 'description', 'duration_minutes')
 
 
 class ServiceTypeRegisterSerializer(serializers.ModelSerializer):
