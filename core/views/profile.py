@@ -1,5 +1,6 @@
 from decimal import Decimal, InvalidOperation
 
+from django.db.models import ProtectedError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
@@ -12,10 +13,23 @@ from core.serializers import (
     ProviderRegisterSerializer,
     ProviderSerializer,
 )
+from core.services.service_flow import Conflict
 from core.utils.geo import haversine_annotation
 
+PROFILE_DELETE_BLOCKED_MESSAGE = 'Não é possível excluir o perfil: há passeios ou avaliações vinculados.'
 
-class ClientViewSet(ModelViewSet):
+
+class ProtectedDestroyMixin:
+    """Perfil com passeios ou avaliações (FKs PROTECT) não pode ser excluído: responde 409 em vez de 500."""
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+        except ProtectedError as error:
+            raise Conflict(PROFILE_DELETE_BLOCKED_MESSAGE) from error
+
+
+class ClientViewSet(ProtectedDestroyMixin, ModelViewSet):
     queryset = ClientProfile.objects.all()
 
     def get_queryset(self):
@@ -31,7 +45,7 @@ class ClientViewSet(ModelViewSet):
         return ClientSerializer
 
 
-class ProviderViewSet(ModelViewSet):
+class ProviderViewSet(ProtectedDestroyMixin, ModelViewSet):
     queryset = (
         ProviderProfile.objects.with_rating()
         .select_related('user__profile_picture', 'service_type')

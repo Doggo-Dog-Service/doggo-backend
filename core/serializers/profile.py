@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from core.models import ClientProfile, ProviderProfile
 from core.serializers.availability import ProviderAvailabilitySerializer
+from core.serializers.pet import PetSerializer
 from core.serializers.user import UserSerializer
 
 CLIENT_DUPLICATE_MESSAGE = 'Usuário já possui perfil de cliente.'
@@ -27,10 +28,12 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class ClientDetailSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    pets = PetSerializer(many=True, read_only=True)
+
     class Meta:
         model = ClientProfile
         fields = ('id', 'user', 'pets', 'last_latitude', 'last_longitude', 'created_at')
-        depth = 1
 
 
 class ProviderSerializer(serializers.ModelSerializer):

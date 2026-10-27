@@ -9,6 +9,8 @@ from uploader.models import Image
 
 CLIENT_DUPLICATE_MESSAGE = 'Usuário já possui perfil de cliente.'
 PROVIDER_DUPLICATE_MESSAGE = 'Usuário já possui perfil de prestador.'
+PROFILE_DELETE_BLOCKED_MESSAGE = 'Não é possível excluir o perfil: há passeios ou avaliações vinculados.'
+VALID_CPF = '52998224725'
 PRIVATE_PROVIDER_KEYS = ('email', 'phone', 'services', 'user')
 EXTRA_PROVIDERS = 4
 REVIEW_COUNT = 2
@@ -119,6 +121,39 @@ class ClientProfileAccessTestCase(FlowTestCase):
         assert CLIENT_DUPLICATE_MESSAGE in response.data['non_field_errors']
         assert ClientProfile.objects.filter(user=self.tutor_user).count() == 1
 
+    def test_detalhe_do_proprio_cliente_nao_expoe_credenciais(self):
+        self.tutor_user.cpf = VALID_CPF
+        self.tutor_user.save()
+        self.auth(self.tutor_user)
+
+        response = self.client.get(client_detail_url(self.tutor))
+
+        body = response.content.decode()
+        assert response.status_code == status.HTTP_200_OK
+        for private in ('password', 'cpf', VALID_CPF, self.tutor_user.password, self.tutor_user.phone):
+            assert private not in body
+        assert 'password' not in response.data['user']
+        assert response.data['user']['id'] == self.tutor_user.pk
+        assert [pet['id'] for pet in response.data['pets']] == [self.pet.pk]
+
+    def test_exclui_o_proprio_cliente_sem_historico(self):
+        own = make_client(self.outsider_user)
+        self.auth(self.outsider_user)
+
+        response = self.client.delete(client_detail_url(own))
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not ClientProfile.objects.filter(pk=own.pk).exists()
+
+    def test_nao_exclui_cliente_com_passeios(self):
+        self.auth(self.tutor_user)
+
+        response = self.client.delete(client_detail_url(self.tutor))
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.data['detail'] == PROFILE_DELETE_BLOCKED_MESSAGE
+        assert ClientProfile.objects.filter(pk=self.tutor.pk).exists()
+
 
 class ProviderProfileAccessTestCase(FlowTestCase):
     def test_qualquer_logado_ve_prestadores(self):
@@ -148,6 +183,34 @@ class ProviderProfileAccessTestCase(FlowTestCase):
         assert response.status_code == status.HTTP_200_OK
         self.walker.refresh_from_db()
         assert self.walker.is_active is False
+
+    def test_exclui_o_proprio_prestador_sem_historico(self):
+        own = make_provider(self.outsider_user, service_type=self.walker.service_type)
+        self.auth(self.outsider_user)
+
+        response = self.client.delete(provider_detail_url(own))
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not ProviderProfile.objects.filter(pk=own.pk).exists()
+
+    def test_nao_exclui_prestador_com_passeios(self):
+        self.auth(self.walker_user)
+
+        response = self.client.delete(provider_detail_url(self.walker))
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.data['detail'] == PROFILE_DELETE_BLOCKED_MESSAGE
+        assert ProviderProfile.objects.filter(pk=self.walker.pk).exists()
+
+    def test_nao_exclui_prestador_com_avaliacoes(self):
+        own = make_provider(self.outsider_user, service_type=self.walker.service_type)
+        make_review(own, self.tutor, 5)
+        self.auth(self.outsider_user)
+
+        response = self.client.delete(provider_detail_url(own))
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert ProviderProfile.objects.filter(pk=own.pk).exists()
 
     def test_cria_perfil_de_prestador_para_si(self):
         self.auth(self.outsider_user)
