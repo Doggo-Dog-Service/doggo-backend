@@ -3,7 +3,10 @@ from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
+
+from app.env import DEFAULT_ALLOWED_HOSTS, DEFAULT_FRONTEND_ORIGINS, env_bool, env_list
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -15,16 +18,26 @@ MODE = os.getenv('MODE')
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Segurança e configuração básica
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure')
-DEBUG = os.getenv('DEBUG', 'False')
-ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'https://doggo-frontend.vercel.app',
-    'https://doggo-backend.class.fabricadesoftware.ifc.edu.br'
-]
-CORS_ALLOW_ALL_ORIGINS = True
+DEBUG = env_bool('DEBUG', False)
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Defina SECRET_KEY no ambiente.')
+    SECRET_KEY = 'django-insecure-dev-only'
+
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS)
+CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', DEFAULT_FRONTEND_ORIGINS)
+CSRF_TRUSTED_ORIGINS = env_list(
+    'CSRF_TRUSTED_ORIGINS',
+    DEFAULT_FRONTEND_ORIGINS + ['https://doggo-backend.class.fabricadesoftware.ifc.edu.br'],
+)
+
+if not DEBUG:
+    # Em produção o TLS termina no proxy reverso, que informa o esquema original pelo cabeçalho X-Forwarded-Proto
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # Aplicações instaladas
 INSTALLED_APPS = [
@@ -161,13 +174,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configurações do DRF e drf-spectacular (OpenAPI/Swagger)
 SPECTACULAR_SETTINGS = {
-    'TITLE': '<PROJETO> API',
-    'DESCRIPTION': 'API para o projeto <descreva aqui seu projeto>.',
+    'TITLE': 'DOGGO API',
+    'DESCRIPTION': 'API da plataforma DOGGO — Dog Services.',
     'VERSION': '1.0.0',
 }
 
 # Modelo de usuário personalizado
 AUTH_USER_MODEL = 'core.User'
+
+# Limite de requisições dos endpoints de autenticação (escopo 'auth' do throttle)
+AUTH_THROTTLE_RATE = os.getenv('AUTH_THROTTLE_RATE', '10/min')
 
 # Configurações do Django REST Framework
 REST_FRAMEWORK = {
@@ -176,6 +192,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'app.pagination.CustomPagination',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 10,
+    'DEFAULT_THROTTLE_RATES': {'auth': AUTH_THROTTLE_RATE},
 }
 
 # Configurações do Simple JWT
@@ -184,6 +201,3 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Tokens de atualização expiram em 1 dia
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
-# Exibe as configurações principais para verificação
-print(f'{MODE = } \n{MEDIA_URL = } \n{DATABASES = }')
