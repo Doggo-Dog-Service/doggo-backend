@@ -2,8 +2,8 @@ from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import ClientProfile, ProviderProfile
-from core.serializers import ClientSerializer, ProviderSerializer
+from core.models import ProviderProfile
+from core.serializers import ProviderSerializer
 
 
 class GlobalSearchView(APIView):
@@ -17,17 +17,18 @@ class GlobalSearchView(APIView):
                 'clients': []
             })
 
-        providers = ProviderProfile.objects.filter(
-            Q(user__full_name__icontains=query) |
-            Q(description__icontains=query) |
-            Q(service_type__name__icontains=query)
+        providers = (
+            ProviderProfile.objects.with_rating()
+            .select_related('user__profile_picture', 'service_type')
+            .filter(
+                Q(user__full_name__icontains=query) |
+                Q(description__icontains=query) |
+                Q(service_type__name__icontains=query)
+            )
         )
 
-        clients = ClientProfile.objects.filter(
-            Q(user__full_name__icontains=query)
-        )
-
+        # Clientes não entram na busca (dados pessoais e localização); a chave fica por compatibilidade.
         return Response({
             'providers': ProviderSerializer(providers, many=True).data,
-            'clients': ClientSerializer(clients, many=True).data
+            'clients': []
         })

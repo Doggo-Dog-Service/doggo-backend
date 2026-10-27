@@ -1,8 +1,10 @@
 from decimal import Decimal, InvalidOperation
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import ClientProfile, ProviderProfile
+from core.permissions import IsProfileOwnerOrReadOnly
 from core.serializers import (
     ClientDetailSerializer,
     ClientSerializer,
@@ -16,6 +18,13 @@ from core.utils.geo import haversine_annotation
 class ClientViewSet(ModelViewSet):
     queryset = ClientProfile.objects.all()
 
+    def get_queryset(self):
+        # Perfil de cliente é privado (tem localização): cada usuário enxerga só o próprio; os demais recebem 404.
+        user = self.request.user
+        if not user.is_authenticated:
+            return ClientProfile.objects.none()
+        return ClientProfile.objects.filter(user=user).order_by('id')
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ClientDetailSerializer
@@ -23,7 +32,12 @@ class ClientViewSet(ModelViewSet):
 
 
 class ProviderViewSet(ModelViewSet):
-    queryset = ProviderProfile.objects.all()
+    queryset = (
+        ProviderProfile.objects.with_rating()
+        .select_related('user__profile_picture', 'service_type')
+        .order_by('id')
+    )
+    permission_classes = [IsAuthenticated, IsProfileOwnerOrReadOnly]
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
