@@ -23,6 +23,8 @@ READ_ONLY_ID_FIELDS = ('providers', 'services')
 SERVICE_TYPE_FIELDS = {'id', 'name', 'description', 'duration_minutes'}
 TWO_PAYMENTS = 2
 REVIEW_RATING = 5
+INTEGER_MESSAGE = 'Informe um número inteiro'
+PRIVATE_REVIEW_DETAIL_TERMS = ('last_latitude', 'last_longitude', 'fixed_latitude', 'password', 'cpf', 'email')
 
 
 def reviews_list_url():
@@ -102,6 +104,31 @@ class ReviewReadOnlyTestCase(FlowTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert {item['id'] for item in response.data['results']} == {self.review.pk, old.pk}
         assert old.service is None
+
+    def test_provider_id_invalido_na_listagem_retorna_400(self):
+        self.auth(self.tutor_user)
+
+        response = self.client.get(reviews_list_url(), {'provider_id': 'abc'})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert str(response.data['provider_id']) == INTEGER_MESSAGE
+
+    def test_detalhe_da_avaliacao_nao_expoe_localizacao_nem_credenciais(self):
+        self.walker.last_latitude = Decimal('-27.123456')
+        self.walker.last_longitude = Decimal('-48.654321')
+        self.walker.save()
+        self.walker_user.cpf = '52998224725'
+        self.walker_user.save()
+        self.auth(self.outsider_user)
+
+        response = self.client.get(review_detail_url(self.review))
+
+        body = response.content.decode()
+        assert response.status_code == status.HTTP_200_OK
+        for private in PRIVATE_REVIEW_DETAIL_TERMS + ('-27.123456', '-48.654321', self.walker_user.cpf):
+            assert private not in body
+        assert response.data['provider'] == self.walker.pk
+        assert response.data['client']['user']['id'] == self.tutor_user.pk
 
 
 class PaymentAccessTestCase(FlowTestCase):

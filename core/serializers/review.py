@@ -50,6 +50,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
+    # Só o id do prestador: aninhá-lo (depth) exporia a localização e demais dados do perfil.
+    provider = serializers.PrimaryKeyRelatedField(read_only=True)
     client = ReviewClientSerializer(read_only=True)
 
     class Meta:
@@ -62,4 +64,3 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             'comment',
             'created_at',
         )
-        depth = 1
