@@ -1,3 +1,4 @@
+from django.db.models import ProtectedError
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -10,6 +11,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from core.models import User
 from core.serializers import UserProfileSerializer, UserRegistrationSerializer, UserSerializer
+from core.services.service_flow import Conflict
+
+DELETE_BLOCKED_MESSAGE = 'Não é possível excluir a conta: há passeios, avaliações ou pagamentos vinculados.'
 
 
 class UserViewSet(ModelViewSet):
@@ -21,6 +25,12 @@ class UserViewSet(ModelViewSet):
 
     def get_queryset(self):
         return User.objects.filter(pk=self.request.user.pk).order_by('id')
+
+    def perform_destroy(self, instance):
+        try:
+            instance.delete()
+        except ProtectedError as error:
+            raise Conflict(DELETE_BLOCKED_MESSAGE) from error
 
     @extend_schema(
         summary="Dados do usuário autenticado",

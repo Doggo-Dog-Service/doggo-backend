@@ -16,6 +16,7 @@ MASKED_VALID_CPF = '529.982.247-25'
 STRONG_PASSWORD = 'Cachorro-Feliz-93'
 LOGIN_PASSWORD = 'pw12345'
 THROTTLE_LIMIT = 2
+DELETE_BLOCKED_MESSAGE = 'Não é possível excluir a conta: há passeios, avaliações ou pagamentos vinculados.'
 
 
 def users_list_url():
@@ -93,6 +94,23 @@ class UserAccessTestCase(FlowTestCase):
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert User.objects.filter(pk=self.walker_user.pk).exists()
+
+    def test_apaga_a_propria_conta_sem_historico(self):
+        self.auth(self.outsider_user)
+
+        response = self.client.delete(user_detail_url(self.outsider_user))
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not User.objects.filter(pk=self.outsider_user.pk).exists()
+
+    def test_apagar_a_propria_conta_com_passeio_retorna_409(self):
+        self.auth(self.tutor_user)
+
+        response = self.client.delete(user_detail_url(self.tutor_user))
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.data['detail'] == DELETE_BLOCKED_MESSAGE
+        assert User.objects.filter(pk=self.tutor_user.pk).exists()
 
     def test_nao_se_promove_a_admin(self):
         self.auth(self.tutor_user)
