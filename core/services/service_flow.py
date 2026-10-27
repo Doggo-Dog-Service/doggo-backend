@@ -14,6 +14,7 @@ from rest_framework.exceptions import APIException, PermissionDenied
 
 from core.models import ProviderProfile, Service
 from core.services import booking
+from core.services.service_events import publish_service_event
 from core.utils.geo import path_distance
 
 START_WINDOW = timedelta(minutes=30)
@@ -50,6 +51,12 @@ def _lock(service):
     return Service.objects.select_for_update().get(pk=service.pk)
 
 
+def _publish_on_commit(service, event_type):
+    """Agenda o evento para depois do commit: o WebSocket só avisa de transições que foram de fato gravadas."""
+    service_id, service_status = service.pk, service.status
+    transaction.on_commit(lambda: publish_service_event(service_id, event_type, service_status))
+
+
 def confirm(service, user):
     _require_actor(service, user, 'provider')
 
@@ -63,6 +70,7 @@ def confirm(service, user):
             raise Conflict('Horário em conflito com outro serviço')
         service.status = Service.Status.CONFIRMED
         service.save(update_fields=['status'])
+        _publish_on_commit(service, 'walk_confirmed')
 
     return service
 
@@ -75,6 +83,7 @@ def reject(service, user):
         _require_status(service, {Service.Status.IN_REVIEW}, 'Serviço não está pendente')
         service.status = Service.Status.REJECTED
         service.save(update_fields=['status'])
+        _publish_on_commit(service, 'walk_rejected')
 
     return service
 
@@ -91,6 +100,7 @@ def cancel(service, user):
         )
         service.status = Service.Status.CANCELLED
         service.save(update_fields=['status'])
+        _publish_on_commit(service, 'walk_cancelled')
 
     return service
 
@@ -111,6 +121,7 @@ def start(service, user, now=None):
         service.status = Service.Status.IN_PROGRESS
         service.started_at = now
         service.save(update_fields=['status', 'started_at'])
+        _publish_on_commit(service, 'walk_started')
 
     return service
 
@@ -126,5 +137,6 @@ def complete(service, user):
         service.finished_at = timezone.now()
         service.distance_meters = path_distance(points)
         service.save(update_fields=['status', 'finished_at', 'distance_meters'])
+        _publish_on_commit(service, 'walk_completed')
 
     return service
