@@ -4,9 +4,10 @@ from unittest import mock
 from django.conf import settings
 from django.test import SimpleTestCase
 
-from app.env import DEFAULT_ALLOWED_HOSTS, env_bool, env_list
+from app.env import DEFAULT_ALLOWED_HOSTS, LAN_FRONTEND_ORIGIN, env_bool, env_list, with_dev_ip
 
 PRODUCTION_HOST = 'doggo-backend.class.fabricadesoftware.ifc.edu.br'
+LAN_IP = '192.168.0.10'
 
 
 class EnvBoolTests(SimpleTestCase):
@@ -36,6 +37,34 @@ class EnvListTests(SimpleTestCase):
         with mock.patch.dict(os.environ):
             os.environ.pop('LISTA_TESTE', None)
             assert env_list('LISTA_TESTE', ['x', 'y']) == ['x', 'y']
+
+
+class WithDevIpTests(SimpleTestCase):
+    def test_acrescenta_o_ip_da_lan_em_debug(self):
+        assert with_dev_ip(['localhost'], LAN_IP, debug=True) == ['localhost', LAN_IP]
+
+    def test_acrescenta_a_origem_do_frontend_na_lan_em_debug(self):
+        origens = with_dev_ip(['http://localhost:5173'], LAN_IP, debug=True, template=LAN_FRONTEND_ORIGIN)
+
+        assert origens == ['http://localhost:5173', f'http://{LAN_IP}:5173']
+
+    def test_nao_altera_a_lista_fora_de_debug(self):
+        assert with_dev_ip(['localhost'], LAN_IP, debug=False) == ['localhost']
+
+    def test_nao_altera_a_lista_sem_ip(self):
+        for ip in (None, '', '  '):
+            with self.subTest(ip=ip):
+                assert with_dev_ip(['localhost'], ip, debug=True) == ['localhost']
+
+    def test_nao_duplica_o_ip(self):
+        assert with_dev_ip(['localhost', LAN_IP], LAN_IP, debug=True) == ['localhost', LAN_IP]
+
+    def test_nao_altera_a_lista_recebida(self):
+        hosts = ['localhost']
+
+        with_dev_ip(hosts, LAN_IP, debug=True)
+
+        assert hosts == ['localhost']
 
 
 class SettingsTests(SimpleTestCase):

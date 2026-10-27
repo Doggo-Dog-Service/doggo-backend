@@ -348,3 +348,13 @@ class SearchPrivacyTestCase(FlowTestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {'providers': [], 'clients': []}
+
+    def test_schema_documenta_a_busca(self):
+        response = self.client.get(reverse('schema'), {'format': 'json'})
+
+        operation = response.data['paths']['/api/search/']['get']
+        assert [parameter['name'] for parameter in operation['parameters']] == ['q']
+        assert set(response.data['components']['schemas']['GlobalSearchResponse']['properties']) == {
+            'providers',
+            'clients',
+        }

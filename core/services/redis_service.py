@@ -142,7 +142,7 @@ def clear_service_location(service_id: int) -> None:
     é só registrada em log, nunca propagada, para não transformar uma conclusão gravada em erro de resposta.
     """
     try:
-        with closing(redis.Redis.from_url(settings.REDIS_URL, socket_connect_timeout=1)) as client:
+        with closing(redis.Redis.from_url(settings.REDIS_URL, socket_connect_timeout=1, socket_timeout=1)) as client:
             client.delete(
                 RedisService.get_location_key(service_id),
                 RedisService.get_saved_location_key(service_id),

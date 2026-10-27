@@ -25,6 +25,7 @@ TWO_PAYMENTS = 2
 REVIEW_RATING = 5
 INTEGER_MESSAGE = 'Informe um número inteiro'
 PRIVATE_REVIEW_DETAIL_TERMS = ('last_latitude', 'last_longitude', 'fixed_latitude', 'password', 'cpf', 'email')
+PRIVATE_PET_DETAIL_TERMS = ('password', 'cpf', 'user_permissions', 'email', 'is_superuser')
 
 
 def reviews_list_url():
@@ -45,6 +46,10 @@ def payment_detail_url(payment):
 
 def service_types_list_url():
     return reverse('type-services-list')
+
+
+def pet_detail_url(pet):
+    return reverse('pets-detail', args=[pet.pk])
 
 
 def images_url():
@@ -129,6 +134,23 @@ class ReviewReadOnlyTestCase(FlowTestCase):
             assert private not in body
         assert response.data['provider'] == self.walker.pk
         assert response.data['client']['user']['id'] == self.tutor_user.pk
+
+
+class PetDetailTestCase(FlowTestCase):
+    def test_detalhe_do_pet_nao_vaza_dados_do_dono(self):
+        self.tutor_user.cpf = '52998224725'
+        self.tutor_user.save()
+        self.auth(self.tutor_user)
+
+        response = self.client.get(pet_detail_url(self.pet))
+
+        body = response.content.decode()
+        assert response.status_code == status.HTTP_200_OK
+        for private in PRIVATE_PET_DETAIL_TERMS + (self.tutor_user.cpf, self.tutor_user.email):
+            assert private not in body
+        assert response.data['owner'] == self.tutor.pk
+        assert response.data['name'] == self.pet.name
+        assert response.data['pet_picture'] is None
 
 
 class PaymentAccessTestCase(FlowTestCase):

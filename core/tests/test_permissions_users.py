@@ -1,7 +1,8 @@
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.throttling import ScopedRateThrottle
@@ -16,6 +17,7 @@ MASKED_VALID_CPF = '529.982.247-25'
 STRONG_PASSWORD = 'Cachorro-Feliz-93'
 LOGIN_PASSWORD = 'pw12345'
 THROTTLE_LIMIT = 2
+LAST_PROXY_HOP = '10.0.0.1'
 DELETE_BLOCKED_MESSAGE = 'Não é possível excluir a conta: há passeios, avaliações ou pagamentos vinculados.'
 
 
@@ -213,6 +215,29 @@ class UserRegistrationTestCase(FlowTestCase):
 
 
 class AuthThrottleTestCase(FlowTestCase):
+    def login_with_spoofed_forwarded_for(self, attempts=3):
+        """Faz `attempts` logins, cada um com um IP forjado na frente do último salto, que o proxy confiável anexou."""
+        credentials = {'email': self.tutor_user.email, 'password': LOGIN_PASSWORD}
+
+        with mock.patch.dict(ScopedRateThrottle.THROTTLE_RATES, {'auth': f'{THROTTLE_LIMIT}/min'}):
+            return [
+                self.client.post(
+                    reverse('token_obtain_pair'), credentials, HTTP_X_FORWARDED_FOR=f'203.0.113.{n}, {LAST_PROXY_HOP}'
+                ).status_code
+                for n in range(attempts)
+            ]
+
+    def test_login_nao_burla_limite_forjando_x_forwarded_for_com_a_configuracao_padrao(self):
+        statuses = self.login_with_spoofed_forwarded_for()
+
+        assert statuses == [status.HTTP_200_OK, status.HTTP_200_OK, status.HTTP_429_TOO_MANY_REQUESTS]
+
+    @override_settings(REST_FRAMEWORK={**settings.REST_FRAMEWORK, 'NUM_PROXIES': 1})
+    def test_login_atras_de_um_proxy_usa_o_ultimo_salto_do_x_forwarded_for(self):
+        statuses = self.login_with_spoofed_forwarded_for()
+
+        assert statuses == [status.HTTP_200_OK, status.HTTP_200_OK, status.HTTP_429_TOO_MANY_REQUESTS]
+
     def test_login_bloqueado_apos_limite(self):
         credentials = {'email': self.tutor_user.email, 'password': LOGIN_PASSWORD}
 

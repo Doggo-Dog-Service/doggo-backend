@@ -6,7 +6,14 @@ import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
-from app.env import DEFAULT_ALLOWED_HOSTS, DEFAULT_FRONTEND_ORIGINS, env_bool, env_list
+from app.env import (
+    DEFAULT_ALLOWED_HOSTS,
+    DEFAULT_FRONTEND_ORIGINS,
+    LAN_FRONTEND_ORIGIN,
+    env_bool,
+    env_list,
+    with_dev_ip,
+)
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -32,6 +39,12 @@ CSRF_TRUSTED_ORIGINS = env_list(
     'CSRF_TRUSTED_ORIGINS',
     DEFAULT_FRONTEND_ORIGINS + ['https://doggo-backend.class.fabricadesoftware.ifc.edu.br'],
 )
+
+# IP do computador na rede local (gravado no .env por `pdm dev`): só em DEBUG, para abrir o frontend pelo celular
+MY_IP = os.getenv('MY_IP')
+ALLOWED_HOSTS = with_dev_ip(ALLOWED_HOSTS, MY_IP, debug=DEBUG)
+CORS_ALLOWED_ORIGINS = with_dev_ip(CORS_ALLOWED_ORIGINS, MY_IP, debug=DEBUG, template=LAN_FRONTEND_ORIGIN)
+CSRF_TRUSTED_ORIGINS = with_dev_ip(CSRF_TRUSTED_ORIGINS, MY_IP, debug=DEBUG, template=LAN_FRONTEND_ORIGIN)
 
 if not DEBUG:
     # Em produção o TLS termina no proxy reverso, que informa o esquema original pelo cabeçalho X-Forwarded-Proto
@@ -154,7 +167,6 @@ FILE_UPLOAD_PERMISSIONS = 0o640
 
 # Configurações específicas para desenvolvimento, migração e produção
 if MODE == 'DEVELOPMENT':
-    MY_IP = os.getenv('MY_IP', '127.0.0.1')
     MEDIA_URL = 'http://127.0.0.1:8000/media/'
 else:
     MEDIA_URL = '/media/'
@@ -185,6 +197,10 @@ AUTH_USER_MODEL = 'core.User'
 # Limite de requisições dos endpoints de autenticação (escopo 'auth' do throttle)
 AUTH_THROTTLE_RATE = os.getenv('AUTH_THROTTLE_RATE', '10/min')
 
+# Quantos proxies reversos ficam na frente da aplicação. O DRF usa isso para achar o IP real do cliente em
+# X-Forwarded-For; sem o valor, o cabeçalho inteiro (forjável) vira a identidade do throttle.
+NUM_PROXIES = int(os.getenv('NUM_PROXIES', '0' if DEBUG else '1'))
+
 # Configurações do Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
@@ -193,6 +209,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 10,
     'DEFAULT_THROTTLE_RATES': {'auth': AUTH_THROTTLE_RATE},
+    'NUM_PROXIES': NUM_PROXIES,
 }
 
 # Configurações do Simple JWT

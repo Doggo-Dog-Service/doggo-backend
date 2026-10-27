@@ -229,7 +229,7 @@ class ClearServiceLocationTests(SimpleTestCase):
         with mock.patch('redis.Redis.from_url') as from_url:
             clear_service_location(7)
 
-        from_url.assert_called_once_with('redis://redis.test:6379', socket_connect_timeout=1)
+        from_url.assert_called_once_with('redis://redis.test:6379', socket_connect_timeout=1, socket_timeout=1)
         client = from_url.return_value
         client.delete.assert_called_once_with(
             RedisService.get_location_key(7),

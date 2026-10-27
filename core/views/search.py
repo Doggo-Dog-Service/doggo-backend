@@ -1,4 +1,6 @@
 from django.db.models import Q
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,6 +10,21 @@ from core.serializers import ProviderSerializer
 
 class GlobalSearchView(APIView):
 
+    @extend_schema(
+        summary='Busca global',
+        description=(
+            'Busca prestadores por nome, descrição ou tipo de serviço. '
+            '`clients` vem sempre vazio (mantido por compatibilidade): clientes não entram na busca.'
+        ),
+        parameters=[OpenApiParameter('q', str, required=False, description='Termo buscado.')],
+        responses=inline_serializer(
+            name='GlobalSearchResponse',
+            fields={
+                'providers': ProviderSerializer(many=True),
+                'clients': serializers.ListField(child=serializers.DictField()),
+            },
+        ),
+    )
     def get(self, request):
         query = request.query_params.get('q')
 
