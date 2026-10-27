@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework import serializers
 
-from core.models import Pet, Service, ServiceType
+from core.models import Pet, Service, ServiceLocation, ServiceType
 from core.services import booking
 
 from ..utils.geo import haversine
@@ -210,6 +210,30 @@ class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
 
         validated_data['price'] = booking.compute_price(provider, start, end)
         return super().update(instance, validated_data)
+
+
+class ServiceRateSerializer(serializers.Serializer):
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+    comment = serializers.CharField(required=False, allow_blank=True, default='')
+
+
+class ServiceRoutePointSerializer(serializers.ModelSerializer):
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+
+    class Meta:
+        model = ServiceLocation
+        fields = ('latitude', 'longitude', 'created_at')
+
+
+class ServiceRouteSerializer(serializers.Serializer):
+    service_id = serializers.IntegerField()
+    status = serializers.IntegerField()
+    started_at = serializers.DateTimeField(allow_null=True)
+    finished_at = serializers.DateTimeField(allow_null=True)
+    duration_seconds = serializers.IntegerField(allow_null=True)
+    distance_meters = serializers.FloatField(allow_null=True)
+    points = ServiceRoutePointSerializer(many=True)
 
 
 class ServiceTypeSerializer(serializers.ModelSerializer):

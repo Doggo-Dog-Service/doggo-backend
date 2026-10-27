@@ -10,8 +10,11 @@ from rest_framework.viewsets import ModelViewSet
 from core.models import ProviderProfile, Service, ServiceType
 from core.permissions import IsServiceOwnerOrProvider
 from core.serializers import (
+    ReviewSerializer,
     ServiceCreateUpdateSerializer,
     ServiceListSerializer,
+    ServiceRateSerializer,
+    ServiceRouteSerializer,
     ServiceTypeRegisterSerializer,
     ServiceTypeSerializer,
 )
@@ -98,6 +101,21 @@ class ServiceViewSet(ModelViewSet):
     def complete(self, request, pk=None):
         service = service_flow.complete(self.get_object(), request.user)
         return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=ServiceRateSerializer, responses={201: ReviewSerializer})
+    @action(detail=True, methods=['post'])
+    def rate(self, request, pk=None):
+        service = self.get_object()
+        serializer = ServiceRateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        review = service_flow.rate(service, request.user, **serializer.validated_data)
+        return Response(ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(responses=ServiceRouteSerializer)
+    @action(detail=True, methods=['get'])
+    def route(self, request, pk=None):
+        route = service_flow.route_summary(self.get_object())
+        return Response(ServiceRouteSerializer(route).data)
 
 
 class ServiceTypeViewSet(ModelViewSet):

@@ -1,4 +1,11 @@
 import json
+import logging
+from contextlib import closing
+
+import redis
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class RedisService:
@@ -110,3 +117,20 @@ class RedisService:
             json.dumps(location),
             ex=self.LOCATION_TTL,
         )
+
+
+def clear_service_location(service_id: int) -> None:
+    """Apaga do Redis a localização e a distância temporárias do serviço, de forma síncrona.
+
+    Roda depois do commit (`transaction.on_commit`), quando o passeio já foi concluído: uma falha do Redis
+    é só registrada em log, nunca propagada, para não transformar uma conclusão gravada em erro de resposta.
+    """
+    try:
+        with closing(redis.Redis.from_url(settings.REDIS_URL, socket_connect_timeout=1)) as client:
+            client.delete(
+                RedisService.get_location_key(service_id),
+                RedisService.get_saved_location_key(service_id),
+                RedisService.get_distance_key(service_id),
+            )
+    except Exception:
+        logger.exception('Falha ao limpar a localização do serviço %s no Redis', service_id)

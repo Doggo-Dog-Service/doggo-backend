@@ -30,6 +30,10 @@ class ServiceEventTests(FlowTestCase):
         patcher = mock.patch('core.services.service_events.get_channel_layer', return_value=self.layer)
         patcher.start()
         self.addCleanup(patcher.stop)
+        # `complete` também limpa o Redis no commit; aqui o foco é o evento, então não tocamos no Redis real.
+        redis_patcher = mock.patch('core.services.redis_service.clear_service_location')
+        redis_patcher.start()
+        self.addCleanup(redis_patcher.stop)
         self.channel = async_to_sync(self.layer.new_channel)()
         async_to_sync(self.layer.group_add)(f'service_{self.service.pk}', self.channel)
 
