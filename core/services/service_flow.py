@@ -57,6 +57,12 @@ def _publish_on_commit(service, event_type):
     transaction.on_commit(lambda: publish_service_event(service_id, event_type, service_status))
 
 
+def require_editable(service, user):
+    """Só o tutor altera o agendamento, e só enquanto o prestador ainda não respondeu (Em análise)."""
+    _require_actor(service, user, 'client')
+    _require_status(service, {Service.Status.IN_REVIEW}, 'Só é possível alterar um serviço em análise')
+
+
 def confirm(service, user):
     _require_actor(service, user, 'provider')
 
