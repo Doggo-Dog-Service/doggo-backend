@@ -12,13 +12,6 @@ BLOCKING_STATUSES = [
     Service.Status.IN_PROGRESS,
 ]
 
-IN_REVIEW_STATUS = str(Service.Status.IN_REVIEW)
-CONFIRMED_STATUS = str(Service.Status.CONFIRMED)
-IN_PROGRESS_STATUS = str(Service.Status.IN_PROGRESS)
-COMPLETED_STATUS = str(Service.Status.COMPLETED)
-CANCELLED_STATUS = str(Service.Status.CANCELLED)
-REJECTED_STATUS = str(Service.Status.REJECTED)
-
 
 def local_now():
     return timezone.localtime(timezone.now())

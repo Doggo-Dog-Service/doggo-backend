@@ -27,6 +27,18 @@ def haversine(latitude_1, longitude_1, latitude_2, longitude_2):
     return earth_radius * c
 
 
+def path_distance(points):
+    """Distância percorrida, em metros: soma o `haversine` entre pontos (latitude, longitude) consecutivos."""
+    total = 0.0
+    previous = None
+    for latitude, longitude in points:
+        current = (float(latitude), float(longitude))
+        if previous is not None:
+            total += haversine(*previous, *current)
+        previous = current
+    return total
+
+
 def haversine_annotation(lat, lon, lat_field='fixed_latitude', lon_field='fixed_longitude'):
     radius = Value(6371.0, output_field=FloatField())
     user_lat = Radians(Value(lat))

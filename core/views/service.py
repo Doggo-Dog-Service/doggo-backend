@@ -3,7 +3,6 @@ from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -16,13 +15,8 @@ from core.serializers import (
     ServiceTypeRegisterSerializer,
     ServiceTypeSerializer,
 )
-from core.services import booking
-
-
-class Conflict(APIException):
-    status_code = status.HTTP_409_CONFLICT
-    default_detail = 'Conflito com outro agendamento'
-    default_code = 'conflict'
+from core.services import booking, service_flow
+from core.services.service_flow import Conflict
 
 
 class ServiceViewSet(ModelViewSet):
@@ -35,18 +29,12 @@ class ServiceViewSet(ModelViewSet):
         return ServiceListSerializer
 
     def get_queryset(self):
-        if self.action != 'list':
-            return Service.objects.all()
-
         user = self.request.user
+        if not user.is_authenticated:
+            return Service.objects.none()
 
-        filters = Q()
-        if hasattr(user, 'client_profile'):
-            filters |= Q(client=user.client_profile)
-        if hasattr(user, 'provider_profile'):
-            filters |= Q(provider=user.provider_profile)
-
-        queryset = Service.objects.filter(filters) if filters else Service.objects.none()
+        # Quem não participa do serviço (como cliente ou prestador) recebe 404 em qualquer ação.
+        queryset = Service.objects.filter(Q(client__user=user) | Q(provider__user=user))
 
         status_param = self.request.query_params.get('status')
         if status_param:
@@ -76,75 +64,39 @@ class ServiceViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         service = self.get_object()
-        if service.status != booking.IN_REVIEW_STATUS:
+        if service.status != Service.Status.IN_REVIEW:
             raise Conflict('Serviço não pode ser excluído')
         service.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @extend_schema(request=None)
+    @extend_schema(request=None, responses=ServiceListSerializer)
     @action(detail=True, methods=['post'])
-    def accept(self, request, pk=None):
-        service = self.get_object()
-        if service.provider.user != request.user:
-            raise PermissionDenied('Ação disponível apenas para o prestador')
-        if service.status != booking.IN_REVIEW_STATUS:
-            raise Conflict('Serviço não está pendente')
-
-        with transaction.atomic():
-            ProviderProfile.objects.select_for_update().get(pk=service.provider.pk)
-            service = Service.objects.select_for_update().get(pk=service.pk)
-            if service.status != booking.IN_REVIEW_STATUS:
-                raise Conflict('Serviço não está pendente')
-            if not booking.fits_in_availability(
-                service.provider, service.start_datetime, service.end_datetime
-            ):
-                raise Conflict('O horário não está mais disponível para este prestador')
-            if booking.has_conflict(
-                service.provider,
-                service.start_datetime,
-                service.end_datetime,
-                exclude_pk=service.pk,
-            ):
-                raise Conflict('Horário em conflito com outro serviço')
-            service.status = Service.Status.CONFIRMED
-            service.save(update_fields=['status'])
-
+    def confirm(self, request, pk=None):
+        service = service_flow.confirm(self.get_object(), request.user)
         return Response(self.get_serializer(service).data)
 
-    @extend_schema(request=None)
+    @extend_schema(request=None, responses=ServiceListSerializer)
     @action(detail=True, methods=['post'])
     def reject(self, request, pk=None):
-        service = self.get_object()
-        if service.provider.user != request.user:
-            raise PermissionDenied('Ação disponível apenas para o prestador')
-        if service.status != booking.IN_REVIEW_STATUS:
-            raise Conflict('Serviço não está pendente')
-        service.status = Service.Status.REJECTED
-        service.save(update_fields=['status'])
+        service = service_flow.reject(self.get_object(), request.user)
         return Response(self.get_serializer(service).data)
 
-    @extend_schema(request=None)
+    @extend_schema(request=None, responses=ServiceListSerializer)
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
-        service = self.get_object()
-        if service.client.user != request.user:
-            raise PermissionDenied('Ação disponível apenas para o cliente')
-        if service.status != booking.IN_REVIEW_STATUS:
-            raise Conflict('Serviço não está pendente')
-        service.status = Service.Status.CANCELLED
-        service.save(update_fields=['status'])
+        service = service_flow.cancel(self.get_object(), request.user)
         return Response(self.get_serializer(service).data)
 
-    @extend_schema(request=None)
+    @extend_schema(request=None, responses=ServiceListSerializer)
     @action(detail=True, methods=['post'])
-    def finish(self, request, pk=None):
-        service = self.get_object()
-        if service.provider.user != request.user:
-            raise PermissionDenied('Ação disponível apenas para o prestador')
-        if service.status != booking.IN_PROGRESS_STATUS:
-            raise Conflict('Serviço não está em andamento')
-        service.status = Service.Status.COMPLETED
-        service.save(update_fields=['status'])
+    def start(self, request, pk=None):
+        service = service_flow.start(self.get_object(), request.user)
+        return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=None, responses=ServiceListSerializer)
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        service = service_flow.complete(self.get_object(), request.user)
         return Response(self.get_serializer(service).data)
 
 
