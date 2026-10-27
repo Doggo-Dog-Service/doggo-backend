@@ -29,6 +29,8 @@ class Service(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField(null=True, blank=True)
     started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    distance_meters = models.FloatField(null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, null=False, default=Status.IN_REVIEW)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
