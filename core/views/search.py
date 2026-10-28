@@ -36,6 +36,7 @@ class GlobalSearchView(APIView):
 
         providers = (
             ProviderProfile.objects.with_rating()
+            .approved()
             .select_related('user__profile_picture', 'service_type')
             .filter(
                 Q(user__full_name__icontains=query) |

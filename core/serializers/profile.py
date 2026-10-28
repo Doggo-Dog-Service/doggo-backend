@@ -85,8 +85,11 @@ class ProviderRegisterSerializer(serializers.ModelSerializer):
             'price_per_day',
             'description',
             'is_active',
+            'verification_status',
+            'verification_note',
             'created_at',
         )
+        read_only_fields = ('verification_status', 'verification_note')
 
     def validate(self, attrs):
         user = self.context['request'].user
@@ -127,6 +130,15 @@ class ProviderDetailSerializer(serializers.ModelSerializer):
             'reviews',
             'availability',
         )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get('request')
+        # A situação da verificação só interessa ao dono do perfil.
+        if request is not None and instance.user_id == request.user.id:
+            data['verification_status'] = instance.verification_status
+            data['verification_note'] = instance.verification_note
+        return data
 
     def get_profile_picture(self, obj):
         if obj.user.profile_picture:

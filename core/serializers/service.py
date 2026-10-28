@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework import serializers
 
-from core.models import Pet, Service, ServiceLocation, ServiceType
+from core.models import Pet, ProviderProfile, Service, ServiceLocation, ServiceType
 from core.services import booking
 
 CONTACT_VISIBLE_STATUSES = {Service.Status.CONFIRMED, Service.Status.IN_PROGRESS}
@@ -137,6 +137,8 @@ class ServiceCreateUpdateSerializer(serializers.ModelSerializer):
         provider = self._value(data, 'provider')
         if provider is None:
             raise serializers.ValidationError('Informe o prestador')
+        if self.instance is None and provider.verification_status != ProviderProfile.Verification.APPROVED:
+            raise serializers.ValidationError('Este passeador ainda não está disponível.')
 
         # O cliente informa apenas o início; a duração vem do tipo de serviço do prestador.
         end = self._value(data, 'end_datetime')
