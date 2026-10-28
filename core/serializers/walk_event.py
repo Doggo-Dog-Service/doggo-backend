@@ -38,6 +38,8 @@ class WalkEventCreateSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+        if (attrs.get('latitude') is None) != (attrs.get('longitude') is None):
+            raise serializers.ValidationError('Informe latitude e longitude juntas.')
         if attrs['kind'] == WalkEvent.Kind.PHOTO:
             if attrs.get('image_attachment_key') is None:
                 raise serializers.ValidationError({'image_attachment_key': 'Envie a foto.'})

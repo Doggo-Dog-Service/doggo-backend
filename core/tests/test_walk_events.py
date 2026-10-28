@@ -85,6 +85,14 @@ class AddEventTests(WalkEventTestCase):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert str(response.data['detail']) == ONLY_IN_PROGRESS_MESSAGE
 
+    def test_so_latitude_ou_so_longitude_retorna_400(self):
+        for data in ({'kind': 'pee', 'latitude': -27.5}, {'kind': 'pee', 'longitude': -48.5}):
+            response = self.post_event(self.walker_user, data)
+
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert 'Informe latitude e longitude juntas.' in str(response.data)
+        assert WalkEvent.objects.count() == 0
+
     def test_tipo_invalido_retorna_400(self):
         response = self.post_event(self.walker_user, {'kind': 'xyz'})
 
@@ -261,7 +269,7 @@ class PublishWalkEventTests(WalkEventTestCase):
         with self.captureOnCommitCallbacks(execute=False):
             self.client.post(self.events_url, {'kind': 'pee'}, format='json')
 
-        with raises(TimeoutError):
+        with raises(asyncio.TimeoutError):
             self.receive()
 
     def test_falha_no_canal_nao_quebra_a_resposta(self):
@@ -286,6 +294,17 @@ class ReviewListVisibilityTests(FlowTestCase):
         response = self.client.get('/api/reviews/')
 
         assert [item['id'] for item in response.data['results']] == [visible.pk]
+
+    def test_detalhe_de_avaliacao_de_prestador_nao_aprovado_retorna_404(self):
+        hidden_provider = make_provider(
+            make_user('rejected@test.com'), verification_status=ProviderProfile.Verification.REJECTED
+        )
+        hidden = Review.objects.create(provider=hidden_provider, client=self.tutor, rating=1, comment='oculta')
+        visible = Review.objects.create(provider=self.walker, client=self.tutor, rating=5, comment='ok')
+        self.auth(self.tutor_user)
+
+        assert self.client.get(f'/api/reviews/{hidden.pk}/').status_code == status.HTTP_404_NOT_FOUND
+        assert self.client.get(f'/api/reviews/{visible.pk}/').status_code == status.HTTP_200_OK
 
 
 @override_settings(CHANNEL_LAYERS=IN_MEMORY_LAYER)

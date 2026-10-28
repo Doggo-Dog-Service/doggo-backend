@@ -18,9 +18,8 @@ class ReviewViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset().order_by('-created_at', '-id')
 
-        if self.action == 'list':
-            # Avaliações de passeadores não aprovados não aparecem na listagem pública.
-            queryset = queryset.filter(provider__verification_status=ProviderProfile.Verification.APPROVED)
+        # Avaliações de passeadores não aprovados não aparecem (lista nem detalhe).
+        queryset = queryset.filter(provider__verification_status=ProviderProfile.Verification.APPROVED)
 
         provider_id = self.request.query_params.get('provider_id')
 
