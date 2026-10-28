@@ -6,3 +6,4 @@ from .user import UserProfileSerializer, UserRegistrationSerializer, UserSeriali
 from .payment import PaymentSerializer, PaymentDetailSerializer
 from .review import ReviewSerializer, ReviewDetailSerializer
 from .availability import ProviderAvailabilitySerializer, ProviderAvailabilityCreateUpdateSerializer
+from .walk_event import WalkEventSerializer, WalkEventCreateSerializer, ServiceNoteSerializer

@@ -65,6 +65,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'distance',
             'contact_phone',
             'is_rating',
+            'provider_note',
             'created_at'
         )
 

@@ -14,11 +14,14 @@ from core.serializers import (
     ReviewSerializer,
     ServiceCreateUpdateSerializer,
     ServiceListSerializer,
+    ServiceNoteSerializer,
     ServiceRateSerializer,
     ServiceRouteSerializer,
     ServiceTypeRegisterSerializer,
     ServiceTypeSerializer,
     ServiceUpdateSerializer,
+    WalkEventCreateSerializer,
+    WalkEventSerializer,
 )
 from core.services import booking, service_flow
 from core.services.service_flow import Conflict
@@ -148,6 +151,27 @@ class ServiceViewSet(ModelViewSet):
     def route(self, request, pk=None):
         route = service_flow.route_summary(self.get_object())
         return Response(ServiceRouteSerializer(route).data)
+
+    @extend_schema(methods=['GET'], responses=WalkEventSerializer(many=True))
+    @extend_schema(methods=['POST'], request=WalkEventCreateSerializer, responses={201: WalkEventSerializer})
+    @action(detail=True, methods=['get', 'post'])
+    def events(self, request, pk=None):
+        service = self.get_object()
+        if request.method == 'GET':
+            return Response(WalkEventSerializer(service.events.select_related('image'), many=True).data)
+        serializer = WalkEventCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        event = service_flow.add_event(service, request.user, serializer.validated_data)
+        return Response(WalkEventSerializer(event).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(request=ServiceNoteSerializer, responses=ServiceListSerializer)
+    @action(detail=True, methods=['patch'])
+    def note(self, request, pk=None):
+        service = self.get_object()
+        serializer = ServiceNoteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        service = service_flow.set_note(service, request.user, serializer.validated_data['provider_note'])
+        return Response(self.get_serializer(service).data)
 
 
 class ServiceTypeViewSet(ModelViewSet):

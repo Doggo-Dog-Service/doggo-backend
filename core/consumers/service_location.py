@@ -176,6 +176,17 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             )
         )
 
+    async def walk_event_message(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "walk_event",
+                    "service_id": self.service.id,
+                    "event": event["event"],
+                }
+            )
+        )
+
     async def send_error(self, message):
         await self.send(
             text_data=json.dumps(

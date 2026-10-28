@@ -12,12 +12,14 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied
 
-from core.models import ProviderProfile, Review, Service
+from core.models import ProviderProfile, Review, Service, WalkEvent
+from core.serializers.walk_event import WalkEventSerializer
 from core.services import booking, redis_service
-from core.services.service_events import publish_service_event
+from core.services.service_events import publish_service_event, publish_walk_event
 from core.utils.geo import path_distance
 
 START_WINDOW = timedelta(minutes=30)
+MAX_PHOTOS = 3
 
 ACTOR_ERRORS = {
     'provider': 'Ação disponível apenas para o prestador',
@@ -170,6 +172,48 @@ def rate(service, user, rating, comment=''):
         service.save(update_fields=['is_rating'])
 
     return review
+
+
+def add_event(service, user, data):
+    """O passeador marca xixi, cocô, água ou foto durante o passeio; a posição é opcional."""
+
+    _require_actor(service, user, 'provider')
+
+    with transaction.atomic():
+        service = _lock(service)
+        _require_status(service, {Service.Status.IN_PROGRESS}, 'Marcadores só durante o passeio.')
+        is_photo = data['kind'] == WalkEvent.Kind.PHOTO
+        if is_photo and service.events.filter(kind=WalkEvent.Kind.PHOTO).count() >= MAX_PHOTOS:
+            raise Conflict(f'Limite de {MAX_PHOTOS} fotos por passeio.')
+        event = WalkEvent.objects.create(
+            service=service,
+            kind=data['kind'],
+            latitude=data.get('latitude'),
+            longitude=data.get('longitude'),
+            image=data.get('image_attachment_key'),
+        )
+        payload = dict(WalkEventSerializer(event).data)
+        service_id = service.pk
+        transaction.on_commit(lambda: publish_walk_event(service_id, payload))
+
+    return event
+
+
+def set_note(service, user, note):
+    """O passeador deixa a nota para o tutor, durante o passeio ou depois de concluído."""
+    _require_actor(service, user, 'provider')
+
+    with transaction.atomic():
+        service = _lock(service)
+        _require_status(
+            service,
+            {Service.Status.IN_PROGRESS, Service.Status.COMPLETED},
+            'A nota só pode ser enviada durante ou depois do passeio.',
+        )
+        service.provider_note = note
+        service.save(update_fields=['provider_note'])
+
+    return service
 
 
 def route_summary(service):

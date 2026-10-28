@@ -29,3 +29,15 @@ def publish_service_event(service_id: int, event_type: str, status: int) -> None
         )
     except Exception:
         logger.exception('Falha ao publicar o evento %s do serviço %s', event_type, service_id)
+
+
+def publish_walk_event(service_id: int, event: dict) -> None:
+    """Publica um marcador do passeio no grupo do serviço. Nunca levanta (mesmo motivo de `publish_service_event`)."""
+    try:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'service_{service_id}',
+            {'type': 'walk_event_message', 'event': event},
+        )
+    except Exception:
+        logger.exception('Falha ao publicar o marcador do serviço %s', service_id)
