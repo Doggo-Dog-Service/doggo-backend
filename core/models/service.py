@@ -35,6 +35,7 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     is_rating = models.BooleanField(default=False)
+    provider_note = models.TextField(blank=True, default='')
 
     def __str__(self):
         return f'({self.id}) provedor: {self.provider.user.email}, cliente: {self.client.user.email}'

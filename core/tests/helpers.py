@@ -44,7 +44,14 @@ def make_service_type(name='Dog Walker', duration_minutes=SERVICE_DURATION_MINUT
     return ServiceType.objects.create(name=name, description=name, duration_minutes=duration_minutes)
 
 
-def make_provider(user, *, service_type=None, price_per_hour=Decimal('60.00')):
+def make_provider(
+    user,
+    *,
+    service_type=None,
+    price_per_hour=Decimal('60.00'),
+    verification_status=ProviderProfile.Verification.APPROVED,
+):
+    """Cria o passeador já aprovado (visível na busca); passe `verification_status` para outros estados."""
     return ProviderProfile.objects.create(
         user=user,
         service_type=service_type or make_service_type(),
@@ -52,6 +59,7 @@ def make_provider(user, *, service_type=None, price_per_hour=Decimal('60.00')):
         fixed_longitude=Decimal('-48.5'),
         price_per_hour=price_per_hour,
         is_active=True,
+        verification_status=verification_status,
     )
 
 

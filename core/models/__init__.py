@@ -6,3 +6,6 @@ from .payment import Payment
 from .review import Review
 from .location import ServiceLocation
 from .availability import ProviderAvailability
+
+from .walk_event import WalkEvent
+from .provider_document import ProviderDocument
