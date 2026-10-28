@@ -63,8 +63,12 @@ cover/
 # Django stuff:
 *.log
 local_settings.py
-# db.sqlite3
+db.sqlite3
 db.sqlite3-journal
+
+# Dados locais: banco de desenvolvimento, dump de dados e mídia enviada
+dump.json
+media/
 
 # Flask stuff:
 instance/

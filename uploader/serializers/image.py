@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
-from uploader.helpers.files import CONTENT_TYPE_JPG, CONTENT_TYPE_PNG
+from uploader.helpers.files import CONTENT_TYPE_JPG, CONTENT_TYPE_PNG, get_content_type
 from uploader.models import Image
+
+MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
@@ -12,9 +14,12 @@ class ImageUploadSerializer(serializers.ModelSerializer):
         extra_kwargs = {"file": {"write_only": True}}
 
     def validate_file(self, value):
-        valid_content_types = [CONTENT_TYPE_JPG, CONTENT_TYPE_PNG]
-        if value.content_type not in valid_content_types:
-            raise serializers.ValidationError("Invalid or corrupted image.")
+        if value.size > MAX_IMAGE_SIZE_BYTES:
+            raise serializers.ValidationError('A imagem deve ter no máximo 5 MB.')
+
+        # O tipo vem do conteúdo (python-magic), não do cabeçalho enviado pelo cliente.
+        if get_content_type(value) not in {CONTENT_TYPE_JPG, CONTENT_TYPE_PNG}:
+            raise serializers.ValidationError('Envie uma imagem JPEG ou PNG.')
         return value
 
 

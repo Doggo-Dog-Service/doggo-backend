@@ -9,7 +9,6 @@ from drf_spectacular.views import (
 )
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView,
 )
@@ -19,10 +18,12 @@ from core.views import (
     GlobalSearchView,
     PetViewSet,
     ProfileView,
+    ProviderAvailabilityViewSet,
     ProviderViewSet,
     ReviewViewSet,
     ServiceTypeViewSet,
     ServiceViewSet,
+    ThrottledTokenObtainPairView,
     UserRegistrationView,
     UserViewSet,
 )
@@ -35,6 +36,7 @@ router = DefaultRouter()
 router.register(r'clients', ClientViewSet, basename='clients')
 router.register(r'pets', PetViewSet, basename='pets')
 router.register(r'providers', ProviderViewSet, basename='providers')
+router.register(r'availability', ProviderAvailabilityViewSet, basename='availability')
 router.register(r'services', ServiceViewSet, basename='services')
 router.register(r'type-services', ServiceTypeViewSet, basename='type-services')
 router.register(r'users', UserViewSet, basename='users')
@@ -59,7 +61,7 @@ urlpatterns = [
         name='redoc',
     ),
     # Autenticação JWT
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', ThrottledTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Registro de usuários

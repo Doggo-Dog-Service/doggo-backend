@@ -1,229 +1,183 @@
 from django.db import transaction
 from django.db.models import Q
-from django.utils import timezone
-from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Service, ServiceType
+from core.models import ProviderProfile, Service, ServiceType
+from core.permissions import IsServiceOwnerOrProvider
 from core.serializers import (
+    ReviewSerializer,
     ServiceCreateUpdateSerializer,
     ServiceListSerializer,
+    ServiceNoteSerializer,
+    ServiceRateSerializer,
+    ServiceRouteSerializer,
     ServiceTypeRegisterSerializer,
     ServiceTypeSerializer,
+    ServiceUpdateSerializer,
+    WalkEventCreateSerializer,
+    WalkEventSerializer,
 )
-from core.services import publish_service_event
-from core.utils.geo import haversine
+from core.services import booking, service_flow
+from core.services.service_flow import Conflict
 
 
 class ServiceViewSet(ModelViewSet):
-    def get_queryset(self):
-        user = self.request.user
-
-        if user.is_superuser:
-            return Service.objects.all()
-
-        return Service.objects.filter(Q(client__user=user) | Q(provider__user=user)).distinct()
+    queryset = Service.objects.all()
+    permission_classes = [IsAuthenticated, IsServiceOwnerOrProvider]
+    # Serviço não se apaga nem se substitui por inteiro: o fluxo é cancelar/recusar e editar com PATCH.
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
+    # Filtros da listagem (query string) -> lookup no model; só valem em `list`.
+    list_filters = {'status': 'status', 'provider': 'provider_id', 'client': 'client_id'}
 
     def get_serializer_class(self):
-        if self.action in {'create', 'update', 'partial_update'}:
+        if self.action == 'create':
             return ServiceCreateUpdateSerializer
+        if self.action == 'partial_update':
+            return ServiceUpdateSerializer
         return ServiceListSerializer
 
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['status']
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Service.objects.none()
 
+        # Quem não participa do serviço (como cliente ou prestador) recebe 404 em qualquer ação.
+        queryset = (
+            Service.objects.filter(Q(client__user=user) | Q(provider__user=user))
+            .select_related('client__user__profile_picture', 'provider__user__profile_picture', 'service_type')
+            .prefetch_related('pets__pet_picture')
+        )
+
+        if self.action == 'list':
+            queryset = self._apply_list_filters(queryset)
+
+        return queryset.order_by('-created_at')
+
+    def _apply_list_filters(self, queryset):
+        for param, lookup in self.list_filters.items():
+            value = self.request.query_params.get(param)
+            if not value:
+                continue
+            try:
+                number = int(value)
+            except ValueError:
+                raise ValidationError({param: 'Informe um número inteiro'}) from None
+            queryset = queryset.filter(**{lookup: number})
+        return queryset
+
+    def get_object(self):
+        service = super().get_object()
+        if self.action == 'partial_update':
+            # Falha cedo (403/409), antes de validar o corpo; `perform_update` repete a checagem sob lock.
+            service_flow.require_editable(service, self.request.user)
+        return service
+
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            provider = serializer.validated_data['provider']
+            ProviderProfile.objects.select_for_update().get(pk=provider.pk)
+            if booking.has_conflict(
+                provider,
+                serializer.validated_data['start_datetime'],
+                serializer.validated_data['end_datetime'],
+            ):
+                raise Conflict('Horário indisponível para este prestador')
+            serializer.save()
+
+    def perform_update(self, serializer):
+        service = serializer.instance
+        data = serializer.validated_data
+
+        with transaction.atomic():
+            # Mesma ordem de trava de `service_flow.confirm` (prestador, depois serviço).
+            ProviderProfile.objects.select_for_update().get(pk=service.provider_id)
+            service_flow.require_editable(Service.objects.select_for_update().get(pk=service.pk), self.request.user)
+            if 'start_datetime' in data and booking.has_conflict(
+                service.provider,
+                data['start_datetime'],
+                data['end_datetime'],
+                exclude_pk=service.pk,
+            ):
+                raise Conflict('Horário indisponível para este prestador')
+            serializer.save()
+
+    @extend_schema(request=None, responses=ServiceListSerializer)
+    @action(detail=True, methods=['post'])
+    def confirm(self, request, pk=None):
+        service = service_flow.confirm(self.get_object(), request.user)
+        return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=None, responses=ServiceListSerializer)
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        service = service_flow.reject(self.get_object(), request.user)
+        return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=None, responses=ServiceListSerializer)
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        service = service_flow.cancel(self.get_object(), request.user)
+        return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=None, responses=ServiceListSerializer)
+    @action(detail=True, methods=['post'])
+    def start(self, request, pk=None):
+        service = service_flow.start(self.get_object(), request.user)
+        return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=None, responses=ServiceListSerializer)
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        service = service_flow.complete(self.get_object(), request.user)
+        return Response(self.get_serializer(service).data)
+
+    @extend_schema(request=ServiceRateSerializer, responses={201: ReviewSerializer})
     @action(detail=True, methods=['post'])
     def rate(self, request, pk=None):
         service = self.get_object()
+        serializer = ServiceRateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        review = service_flow.rate(service, request.user, **serializer.validated_data)
+        return Response(ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
 
-        if service.client.user != request.user:
-            return Response(
-                {'detail': 'Apenas o cliente do serviço pode fazer avalições'}, status=status.HTTP_403_FORBIDDEN
-            )
-
-        if service.is_rating:
-            return Response({'detail': 'Esse serviço já foi avaliado'}, status=status.HTTP_400_BAD_REQUEST)
-
-        with transaction.atomic():
-            service.is_rating = True
-            service.save(update_fields=['is_rating'])
-
-        return Response({'is_rating': True}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['post'])
-    def confirm(self, request, pk=None):
-        service = self.get_object()
-
-        if service.provider.user != request.user:
-            return Response(
-                {'detail': 'Apenas o prestador pode confirmar o passeio.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if Service.Status(int(service.status)) != Service.Status.IN_REVIEW:
-            return Response(
-                {'detail': f'Não é possível confirmar: status atual é {service.get_status_display()}.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        with transaction.atomic():
-            service.status = Service.Status.CONFIRMED
-            service.save(update_fields=['status'])
-
-            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_confirmed', Service.Status.CONFIRMED))
-
-        return Response(ServiceListSerializer(service).data)
-
-    @action(detail=True, methods=['post'])
-    def reject(self, request, pk=None):
-        service = self.get_object()
-
-        if service.provider.user != request.user:
-            return Response(
-                {'detail': 'Apenas o prestador pode recusar o passeio.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if Service.Status(int(service.status)) != Service.Status.IN_REVIEW:
-            return Response(
-                {'detail': f'Não é possível recusar: status atual é {service.get_status_display()}.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        with transaction.atomic():
-            service.status = Service.Status.REJECTED
-            service.save(update_fields=['status'])
-
-            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_rejected', Service.Status.REJECTED))
-
-        return Response(ServiceListSerializer(service).data)
-
-    @action(detail=True, methods=['post'])
-    def start(self, request, pk=None):
-        service = self.get_object()
-
-        if service.provider.user != request.user:
-            return Response(
-                {'detail': 'Apenas o prestador pode iniciar o passeio.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if Service.Status(int(service.status)) != Service.Status.CONFIRMED:
-            return Response(
-                {'detail': f'Não é possível iniciar: status atual é {service.get_status_display()}.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        with transaction.atomic():
-            service.status = Service.Status.IN_PROGRESS
-            service.started_at = timezone.now()
-            service.save(update_fields=['status', 'started_at'])
-
-            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_started', Service.Status.IN_PROGRESS))
-
-        return Response(ServiceListSerializer(service).data)
-
-    @action(detail=True, methods=['post'])
-    def complete(self, request, pk=None):
-        service = self.get_object()
-
-        if service.provider.user != request.user:
-            return Response(
-                {'detail': 'Apenas o prestador pode concluir o passeio.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        if Service.Status(int(service.status)) != Service.Status.IN_PROGRESS:
-            return Response(
-                {'detail': 'Apenas passeios em andamento podem ser concluídos.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        with transaction.atomic():
-            service.status = Service.Status.COMPLETED
-            service.end_datetime = timezone.now()
-            service.save(update_fields=['status', 'end_datetime'])
-
-            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_completed', Service.Status.COMPLETED))
-
-        return Response(ServiceListSerializer(service).data)
-
-    @action(detail=True, methods=['post'])
-    def cancel(self, request, pk=None):
-        service = self.get_object()
-
-        user = request.user
-        if service.provider.user != user and service.client.user != user:  # noqa: PLR1714
-            return Response(
-                {'detail': 'Apenas o prestador ou o cliente podem cancelar.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        cancellable = {
-            Service.Status.IN_REVIEW,
-            Service.Status.CONFIRMED,
-            Service.Status.IN_PROGRESS,
-        }
-
-        if Service.Status(int(service.status)) not in cancellable:
-            return Response(
-                {'detail': f'Não é possível cancelar: status atual é {service.get_status_display()}.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        with transaction.atomic():
-            service.status = Service.Status.CANCELLED
-            service.save(update_fields=['status'])
-
-            transaction.on_commit(lambda: publish_service_event(service.id, 'walk_cancelled', Service.Status.CANCELLED))
-
-        return Response(ServiceListSerializer(service).data)
-
+    @extend_schema(responses=ServiceRouteSerializer)
     @action(detail=True, methods=['get'])
     def route(self, request, pk=None):
+        route = service_flow.route_summary(self.get_object())
+        return Response(ServiceRouteSerializer(route).data)
+
+    @extend_schema(methods=['GET'], responses=WalkEventSerializer(many=True))
+    @extend_schema(methods=['POST'], request=WalkEventCreateSerializer, responses={201: WalkEventSerializer})
+    @action(detail=True, methods=['get', 'post'])
+    def events(self, request, pk=None):
         service = self.get_object()
+        if request.method == 'GET':
+            return Response(WalkEventSerializer(service.events.select_related('image'), many=True).data)
+        serializer = WalkEventCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        event = service_flow.add_event(service, request.user, serializer.validated_data)
+        return Response(WalkEventSerializer(event).data, status=status.HTTP_201_CREATED)
 
-        user = request.user
-        if service.provider.user != user and service.client.user != user:  # noqa: PLR1714
-            return Response(
-                {'detail': 'Apenas os envolvidos no passeio podem ver a rota.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        locations = list(service.locations.order_by('created_at').values_list('latitude', 'longitude', 'created_at'))
-
-        total_distance = 0.0
-        for index in range(1, len(locations)):
-            current = locations[index - 1]
-            following = locations[index]
-            total_distance += haversine(
-                current[0],
-                current[1],
-                following[0],
-                following[1],
-            )
-
-        points = [
-            {
-                'latitude': float(latitude),
-                'longitude': float(longitude),
-                'created_at': created_at,
-            }
-            for latitude, longitude, created_at in locations
-        ]
-
-        return Response({
-            'points': points,
-            'total_distance': round(total_distance, 2),
-        })
+    @extend_schema(request=ServiceNoteSerializer, responses=ServiceListSerializer)
+    @action(detail=True, methods=['patch'])
+    def note(self, request, pk=None):
+        service = self.get_object()
+        serializer = ServiceNoteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        service = service_flow.set_note(service, request.user, serializer.validated_data['provider_note'])
+        return Response(self.get_serializer(service).data)
 
 
 class ServiceTypeViewSet(ModelViewSet):
-    queryset = ServiceType.objects.all()
+    """Catálogo público para leitura; só a equipe (staff) cria, altera ou remove tipos."""
+
+    queryset = ServiceType.objects.order_by('id')
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -233,4 +187,4 @@ class ServiceTypeViewSet(ModelViewSet):
     def get_permissions(self):
         if self.action in {'list', 'retrieve'}:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsAdminUser()]

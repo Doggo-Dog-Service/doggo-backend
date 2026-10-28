@@ -2,6 +2,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .profile import ClientProfile, ProviderProfile
+from .service import Service
 
 
 class Review(models.Model):
@@ -21,7 +22,14 @@ class Review(models.Model):
             MaxValueValidator(5),
         ]
     )
-    comment = models.TextField()
+    comment = models.TextField(blank=True, default='')
+    service = models.OneToOneField(
+        Service,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='review',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
