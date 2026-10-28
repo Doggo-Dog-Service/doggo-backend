@@ -364,3 +364,30 @@ class DocumentUploadTestCase(FlowTestCase):
         response = self.client.post(documents_url(), {})
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def upload_document(self, data, *, name, content_type):
+        file = SimpleUploadedFile(name, data, content_type=content_type)
+        return self.client.post(documents_url(), {'file': file, 'description': 'doc'}, format='multipart')
+
+    # Foto do RG/CNH vem do celular em JPEG ou PNG, não só PDF.
+    def test_documento_aceita_png_jpeg_e_pdf(self):
+        self.auth(self.walker_user)
+        jpeg = BytesIO()
+        PilImage.new('RGB', (2, 2)).save(jpeg, format='JPEG')
+        cases = [
+            ('doc.png', image_bytes(), 'image/png'),
+            ('doc.jpg', jpeg.getvalue(), 'image/jpeg'),
+            ('doc.pdf', b'%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF', 'application/pdf'),
+        ]
+        for name, data, content_type in cases:
+            with self.subTest(name=name):
+                response = self.upload_document(data, name=name, content_type=content_type)
+                assert response.status_code == status.HTTP_201_CREATED, response.data
+
+    def test_documento_rejeita_tipo_invalido(self):
+        self.auth(self.walker_user)
+
+        response = self.upload_document(b'texto qualquer', name='doc.png', content_type='image/png')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert str(response.data['file'][0]) == 'Envie o documento em PDF, JPEG ou PNG.'
