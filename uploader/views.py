@@ -4,8 +4,10 @@ from uploader.models import Document, Image
 from uploader.serializers import DocumentUploadSerializer, ImageUploadSerializer
 
 
-class CreateViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
-    pass
+class CreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """Só cria (sem listagem, para não expor o acervo de arquivos) e exige login."""
+
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class DocumentUploadViewSet(CreateViewSet):
@@ -18,4 +20,3 @@ class ImageUploadViewSet(CreateViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageUploadSerializer
     parser_classes = [parsers.FormParser, parsers.MultiPartParser]
-    permission_classes = [permissions.AllowAny]

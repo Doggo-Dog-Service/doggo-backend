@@ -60,7 +60,7 @@ class ProviderAvailabilityViewSet(ModelViewSet):
             raise ValidationError('Informe a data')
 
         try:
-            provider = ProviderProfile.objects.get(pk=provider_id)
+            provider = ProviderProfile.objects.approved().get(pk=provider_id)
         except ProviderProfile.DoesNotExist:
             raise NotFound('Provider não encontrado')
 

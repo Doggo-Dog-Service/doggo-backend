@@ -2,13 +2,12 @@ import json
 
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
-from redis.asyncio import Redis
 
 from ..models import Service
 from ..services import LocationService
+from ..services.redis_service import get_shared_redis
 
 
 class ServiceConsumer(AsyncWebsocketConsumer):
@@ -49,12 +48,8 @@ class ServiceConsumer(AsyncWebsocketConsumer):
             await self.close(code=4003)
             return
 
-        self.redis = Redis.from_url(
-            settings.REDIS_URL
-        )
-
         self.location_service = LocationService(
-            redis=self.redis
+            redis=get_shared_redis()
         )
 
         if self.role in {"client", "provider"}:
@@ -74,9 +69,6 @@ class ServiceConsumer(AsyncWebsocketConsumer):
                 self.group_name,
                 self.channel_name,
             )
-
-        if hasattr(self, "redis"):
-            await self.redis.aclose()
 
     async def receive(self, text_data):
         if self.role != "provider":
@@ -105,6 +97,12 @@ class ServiceConsumer(AsyncWebsocketConsumer):
         await self.handle_location(data)
 
     async def handle_location(self, data):
+        if not await self._is_in_progress():
+            await self.send_error(
+                "Localização só é aceita com o passeio em andamento."
+            )
+            return
+
         latitude = data.get("latitude")
         longitude = data.get("longitude")
 
@@ -165,12 +163,26 @@ class ServiceConsumer(AsyncWebsocketConsumer):
         )
 
     async def service_event(self, event):
+        # Mantém o status local em dia: é ele que libera (início) ou bloqueia (conclusão) a localização.
+        self.service.status = event["status"]
+
         await self.send(
             text_data=json.dumps(
                 {
                     "type": event["event_type"],
                     "service_id": event["service_id"],
                     "status": event["status"],
+                }
+            )
+        )
+
+    async def walk_event_message(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "walk_event",
+                    "service_id": self.service.id,
+                    "event": event["event"],
                 }
             )
         )
@@ -193,6 +205,29 @@ class ServiceConsumer(AsyncWebsocketConsumer):
         ).get(
             id=self.service_id
         )
+
+    async def _is_in_progress(self):
+        """
+        O status em memória vem da conexão e dos eventos do grupo; se
+        ele não indica "em andamento", relê o banco antes de recusar,
+        pois o início pode ter ocorrido sem que o evento chegasse aqui.
+        """
+        if self.service.status != Service.Status.IN_PROGRESS:
+            await self._refresh_status()
+
+        return self.service.status == Service.Status.IN_PROGRESS
+
+    @sync_to_async
+    def _refresh_status(self):
+        current_status = Service.objects.filter(
+            id=self.service_id
+        ).values_list(
+            "status",
+            flat=True,
+        ).first()
+
+        if current_status is not None:
+            self.service.status = current_status
 
     @sync_to_async
     def _get_user_role(self):

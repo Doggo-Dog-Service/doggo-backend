@@ -16,6 +16,18 @@ class IsProviderAvailabilityOwnerOrReadOnly(BasePermission):
         )
 
 
+class IsProfileOwnerOrReadOnly(BasePermission):
+    """Permite leitura a qualquer autenticado; escrita apenas ao dono do perfil (`obj.user`)."""
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated)
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.user == request.user
+
+
 class IsServiceOwnerOrProvider(BasePermission):
     """Permite acesso apenas ao cliente dono ou ao provider dono do Service."""
 

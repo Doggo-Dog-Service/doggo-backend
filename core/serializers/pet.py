@@ -55,6 +55,8 @@ class PetRegisterUpdateSerializer(serializers.ModelSerializer):
 
 
 class PetDetailSerializer(serializers.ModelSerializer):
+    # Só o id do tutor: aninhar o dono (depth) expunha o hash da senha, o CPF e as permissões do usuário.
+    owner = serializers.PrimaryKeyRelatedField(read_only=True)
     pet_picture = ImageSerializer(required=False)
 
     class Meta:
@@ -70,5 +72,4 @@ class PetDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'pet_picture',
         )
-        read_only_fields = ('id', 'owner', 'created_at')
-        depth = 2
+        read_only_fields = ('id', 'created_at')

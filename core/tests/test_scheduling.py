@@ -43,6 +43,7 @@ class SchedulingTestCase(APITestCase):
             service_type=self.walker,
             price_per_hour=Decimal('60.00'),
             is_active=True,
+            verification_status=ProviderProfile.Verification.APPROVED,
         )
 
         self.client_user = User.objects.create_user(email='client@test.com', password='pw12345', full_name='Bruno Lima')

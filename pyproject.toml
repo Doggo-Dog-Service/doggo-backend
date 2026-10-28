@@ -1,7 +1,7 @@
 [project]
-name = "livraria"
+name = "doggo-backend"
 version = "1.0.0"
-description = "Uma API REST de uma livraria feita com Django e Django REST Framework."
+description = "API da plataforma DOGGO — Dog Services."
 authors = [{ name = "Marco André Mendes", email = "marcoandre@gmail.com" }]
 dependencies = [
   'dj-database-url>=2.1.0',
